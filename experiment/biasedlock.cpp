@@ -8,32 +8,29 @@
 #include <stdio.h>
 
 
-inline void biased_lock_owner(Lock * l, int * i)
-{
-	while (l->grant);
+inline void biased_unlock_owner(threaddata * td) 
+{ 
+	if(td->lock->func != NULL) 
+		td->lock->func(td->y,td->lock); 
 }
 
-inline void biased_unlock_owner(Lock * l, int * i)
+inline void noop(int * y, Lock * l)
+{}
+inline void incy (int * y, Lock * l)
 {
-	if(l->request)
-	{
-		l->request = false;
-		asm volatile ("mfence");
-		l->grant = true;
-	}
+	(*y)++;
+		asm volatile("mfence");
+		l->done = 1;
+		l->func = NULL;
 }
 
 inline void biased_lock(Lock * l, int * i)
 {
 	spinlock::lockN(&(l->n));
-	l->request = true;
-	while(!l->grant);
 }
 
-void biased_unlock(Lock * l, int * i)
+inline void biased_unlock(Lock * l, int * i)
 {
-	asm volatile ("mfence");
-	l->grant = false;
 	spinlock::unlockN(&(l->n));
 }
 
@@ -44,9 +41,7 @@ void foo(threaddata * td)
 		std::cout << "owner" << *(td->threadid) << std::endl;
 		for(int i = 0; i < 12000000; i++)
 		{
-			//biased_lock_owner(td->lock, td->threadid);
-			while (td->lock->grant);
-	
+		//	biased_lock_owner(td->lock, td->threadid);
 			*(td->x) = (*td->x) + 1;
 			*(td->x) = (*td->x) + 1;
 			*(td->x) = (*td->x) + 1;
@@ -147,31 +142,30 @@ void foo(threaddata * td)
 			*(td->x) = (*td->x) + 1;
 			*(td->x) = (*td->x) + 1;
 			*(td->x) = (*td->x) + 1;
-		//	biased_unlock_owner(td->lock, td->threadid);
-			
-			if(td->lock->request)
-			{
-				td->lock->request = false;
-				asm volatile ("mfence");
-				td->lock->grant = true;
-			}
+			if(td->lock->func != NULL) td->lock->func (td->y, td->lock);
+	//		biased_unlock_owner(td);
 		}
 		std::cout << "dom thread done" << std::endl;
 	}
 	else
 	{
-		for(int i = 0; i < 20; i++)
+		for(int i = 0; i < 2; i++)
 		{
 			biased_lock(td->lock, td->threadid);
-			*(td->y) = (*td->y) + 1;
+			td->lock->done = 0;
+			//asm volatile ("mfence");
+			td->lock->func = &incy;
+			while(!(td->lock->done));
 			biased_unlock(td->lock, td->threadid);
-			boost::this_thread::sleep(boost::posix_time::microseconds(100));
+			boost::this_thread::sleep(boost::posix_time::microseconds(10));
 		}
 		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
+
 	}
 }	
 
-#define NUM_THREADS 16			
+
+#define NUM_THREADS 16	
 int main()
 {
 	pthread_t threads[NUM_THREADS];
@@ -183,7 +177,9 @@ int main()
 	Lock * lck = new Lock;
 	lck->request = false;
 	lck->grant = false;
-	
+	lck->func = NULL;
+	lck->done = 1;
+
 	threaddata j[NUM_THREADS];
 	int * x = new int(0);
 	int * y = new int(0);

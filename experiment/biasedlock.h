@@ -6,7 +6,9 @@
 #include <boost/interprocess/detail/atomic.hpp>
 #include <unistd.h>
 
-typedef struct {
+
+
+typedef struct lll {
 	cpu_set_t* ownercpu;
 	cpu_set_t* defaultcpus;
 	cpu_set_t* test;
@@ -14,6 +16,8 @@ typedef struct {
 	boost::uint32_t n; //LockN
 	bool request;
 	bool grant;
+	int done;
+	void (*func)(int * y, struct lll * l);
 } Lock;
 
 typedef struct 
@@ -24,6 +28,8 @@ typedef struct
 	int * y;
 } threaddata;
 
-void biased_lock(Lock * l, int * i);
-void biased_unlock(Lock * l, int * i);
+inline void biased_lock(Lock * l, int * i) __attribute__((always_inline));
+inline void biased_unlock_owner(threaddata * td) __attribute__((always_inline));
+inline void biased_unlock(Lock * l, int * i) __attribute__((always_inline));
+inline void incy(threaddata* td) __attribute__((always_inline));
 #endif
