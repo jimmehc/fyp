@@ -13,7 +13,7 @@ typedef struct lll {
 	cpu_set_t* defaultcpus;
 	cpu_set_t* test;
 	//Lock2 t;
-	boost::uint32_t n; //LockN
+	int n; //LockN
 	bool request;
 	bool grant;
 	int done;

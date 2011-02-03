@@ -39,99 +39,9 @@ void foo(threaddata * td)
 	if(*(td->threadid) == 0)
 	{
 		std::cout << "owner" << *(td->threadid) << std::endl;
-		for(int i = 0; i < 12000000; i++)
+		for(int i = 0; i < 120000000; i++)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
-			*(td->x) = (*td->x) + 1;
 			*(td->x) = (*td->x) + 1;
 			*(td->x) = (*td->x) + 1;
 			*(td->x) = (*td->x) + 1;
@@ -157,7 +67,7 @@ void foo(threaddata * td)
 			td->lock->func = &incy;
 			while(!(td->lock->done));
 			biased_unlock(td->lock, td->threadid);
-			boost::this_thread::sleep(boost::posix_time::microseconds(10));
+			usleep(100);	
 		}
 		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 
@@ -165,7 +75,7 @@ void foo(threaddata * td)
 }	
 
 
-#define NUM_THREADS 16	
+#define NUM_THREADS 4	
 int main()
 {
 	pthread_t threads[NUM_THREADS];

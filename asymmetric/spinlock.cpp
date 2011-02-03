@@ -1,19 +1,20 @@
 #include <pthread.h>
-#include <boost/interprocess/detail/atomic.hpp>
 #include <unistd.h>
 #include "spinlock.h"
 
-void spinlock::lockN (boost::uint32_t * lck)
+#define CAS __sync_bool_compare_and_swap
+
+void spinlock::lockN (int * lck)
 {
 	int success = 0;
 	do
 	{
 		while (*lck != 0);
-		success = !(boost::interprocess::detail::atomic_cas32(lck, 1, 0));
+		success = CAS(lck, 0, 1);
 	}while(!success);
 }
 
-void spinlock::unlockN (boost::uint32_t * lck)
+void spinlock::unlockN (int * lck)
 {
 	*lck = 0;
 }
