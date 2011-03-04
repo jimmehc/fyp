@@ -1,0 +1,29 @@
+#ifndef BIASEDLOCK
+#define BIASEDLOCK
+
+#include <sched.h>
+#include <sys/types.h>
+#include <boost/interprocess/detail/atomic.hpp>
+#include <unistd.h>
+
+typedef struct {
+	//Lock2 t;
+	int n; //LockN
+	int t;
+	bool request;
+	bool grant;
+	bool flag[2];
+	int turn;
+} Lock;
+
+typedef struct 
+{
+	int *threadid;
+	Lock *lock;
+	int * x;
+	int * y;
+} threaddata;
+
+void biased_lock(Lock * l, int * i);
+void biased_unlock(Lock * l, int * i);
+#endif
