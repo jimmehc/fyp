@@ -1,3 +1,6 @@
 all:
-	g++ -o asymmetric spinlock.cpp biasedlock.cpp -lpthread
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra
 
+debug:
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DDEBUG
+	

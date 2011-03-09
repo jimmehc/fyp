@@ -7,18 +7,23 @@
 #include <unistd.h>
 
 typedef struct {
-	cpu_set_t* ownercpu;
+/*	cpu_set_t* ownercpu;
 	cpu_set_t* defaultcpus;
-	cpu_set_t* test;
+	cpu_set_t* test;*/
 	//Lock2 t;
-	int n; //LockN
+	int * n1;
+	int * n2;
+	int n;
 	bool request;
 	bool grant;
 } Lock;
 
 typedef struct 
 {
+	//private
 	int *threadid;
+
+	//shared
 	Lock *lock;
 	int * x;
 	int * y;

@@ -1,20 +1,23 @@
 #include <iostream>
 
-
-int hi()
+struct yeah
 {
-	static int x = 0;
-	return x++;
-}
+	int x;
+	int hi()
+	{
+		return x++;
+	}
+};
 
 int main()
 {
-	int (*fp)() = &hi;
+	yeah * y = new yeah;
+	int (yeah::*fp)() = &yeah::hi;
 
-	fp->x = 9;
+	y->x = 9;
 
-	std::cout << fp() << std::endl;
-	std::cout << fp() << std::endl;
-	std::cout << fp() << std::endl;
-	std::cout << fp() << std::endl;
+	std::cout << (y->*fp)() << std::endl;
+	std::cout << (y->*fp)() << std::endl;
+	std::cout << (y->*fp)() << std::endl;
+	std::cout << (y->*fp)() << std::endl;
 }

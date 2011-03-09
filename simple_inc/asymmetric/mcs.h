@@ -18,7 +18,7 @@ void acquire_lock(qnode ** L, qnode * I)
 	{
 		I->locked = true;
 		predecessor->next = I;
-		while(I->locked);
+		while(I->locked) ;
 	}
 }
 
@@ -29,7 +29,7 @@ void release_lock (qnode ** L, qnode * I)
 		if(CAS(L, I, NULL))
 			return;
 
-		while(I->next == NULL);
+		while(I->next == NULL) ; 
 	}
 	I->next->locked = false;
 }

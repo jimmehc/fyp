@@ -1,6 +1,6 @@
 #include <sys/types.h>
 #include "biasedlock.h"
-#include "spinlock.h"
+#include "../../lib/spinlock.h"
 #include "mcs.h"
 #include <iostream>
 #include <sched.h>
@@ -18,35 +18,23 @@ rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
  return ((unsigned long long)lo) + (unsigned long long)(hi<<32ULL);
 }
 
-
-inline void biased_lock_owner(Lock * l, int * i)
-{
-	while (l->grant);
-}
-
-inline void biased_unlock_owner(Lock * l, int * i)
-{
-	if(l->request)
-	{
-		l->request = false;
-		asm volatile ("mfence");
-		l->grant = true;
+#define biased_lock_owner() while(td->lock->grant){asm volatile ("pause");}
+#define biased_unlock_owner()	\
+	if(td->lock->request) \
+	{	\
+		td->lock->request = false; \
+		asm volatile ("mfence");\
+		td->lock->grant = true;\
 	}
-}
 
-inline void biased_lock(Lock * l, int * i)
-{
-	spinlock::lockN(&(l->n));
-	l->request = true;
-	while(!l->grant);
-}
-
-void biased_unlock(Lock * l, int * i)
-{
-	asm volatile ("mfence");
-	l->grant = false;
-	spinlock::unlockN(&(l->n));
-}
+#define biased_lock() \
+	spinlock::lockN(&(td->lock->n)); \
+	td->lock->request = true; \
+	while(!td->lock->grant){ asm volatile ("pause"); }
+#define biased_unlock() \
+	asm volatile ("mfence"); \
+	td->lock->grant = false; \
+	spinlock::unlockN(&(td->lock->n));
 
 void foo(threaddata * td)
 {
@@ -55,37 +43,32 @@ void foo(threaddata * td)
 		std::cout << "owner" << *(td->threadid) << std::endl;
 		for(int i = 0; i < 1000000000; i++)
 		{
-			//biased_lock_owner(td->lock, td->threadid);
-			while (__builtin_expect(td->lock->grant, 0));
+			biased_lock_owner();
+		
 			*(td->x) = (*td->x) + 1;
-		//	biased_unlock_owner(td->lock, td->threadid);
-			
-			if(__builtin_expect(td->lock->request, 0))
-			{
-				td->lock->request = false;
-				asm volatile ("mfence");
-				td->lock->grant = true;
-			}
+		
+			biased_unlock_owner();		
+	
 		}
 		std::cout << "dom thread done" << std::endl;
-	/*	while(1)
-			if(td->lock->request)
-			{	
-	        		td->lock->request = false;
-			        asm volatile ("mfence");
-				td->lock->grant = true;
-			}*/
-	}
+		std::cout << *td->x << std::endl;
+/*		while(1)
+		{
+			biased_unlock_owner();
+		}
+*/	}
 	else
 	{
 		qnode * I = new qnode;
 		timespec * t = new timespec;
 		t->tv_nsec = 1;
-		for(int i = 0; i < 33333333; i++)
+		for(int i = 0; i < 3333333; i++)
 		{
-			biased_lock(td->lock, td->threadid);
+			biased_lock();
+
 			*(td->x) = (*td->x) + 1;
-			biased_unlock(td->lock, td->threadid);
+
+			biased_unlock();
 //			nanosleep(t,NULL);	
 		}
 		std::cout << "time: " << get_time() - start << std::endl;
@@ -98,18 +81,23 @@ int main()
 {
 	pthread_t threads[NUM_THREADS];
 	
-	int * flag = (int *) malloc(sizeof(int)*2);
-	flag[0] = flag[1] = 0;
-	int turn;
-
 	Lock * lck = new Lock;
 	lck->request = false;
 	lck->grant = false;
-	
+
+#if DEBUG
+	std::cout << &lck->n << std::endl;
+	std::cout << &lck->request << std::endl;
+	std::cout << &lck->grant << std::endl;
+#endif	
 	threaddata j[NUM_THREADS];
 	int * x = new int(0);
 	int * y = new int(0);
-
+	
+#if DEBUG
+	std::cout << x << std::endl;
+	std::cout << y << std::endl;
+#endif
 	start = get_time();
 
 	for(int i = 0; i < NUM_THREADS; i++)

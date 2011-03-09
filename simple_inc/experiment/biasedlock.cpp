@@ -2,8 +2,6 @@
 #include "biasedlock.h"
 #include "spinlock.h"
 #include <iostream>
-#include <boost/thread/thread.hpp> 
-#include <boost/thread.hpp> 
 #include <sched.h>
 #include <stdio.h>
 
@@ -27,7 +25,7 @@ inline void biased_unlock_owner(threaddata * td)
 
 inline void noop(int * y, Lock * l)
 {}
-inline void incy (int * const y, Lock * l)
+inline void incy (int * y, Lock * l)
 {
 	(*y)++;
 	l->func = NULL;
@@ -92,14 +90,16 @@ int main()
 	lck->func = NULL;
 	lck->done = 1;
 
+	std::cout << &lck->n <<std::endl;
+
 /*	int* padding[64];
 
 	for(int i=0;i< 64; i++)
 		padding[i] = new int(0);*/
 	
 	threaddata * j[NUM_THREADS];
-	int * const x = new int(0);
-	int * const y = new int(0);
+	int * x = new int(0);
+	int * y = new int(0);
 
 	void (*fp)(int * y, Lock * l) = &incy;
 
@@ -113,7 +113,10 @@ int main()
 	for(int i = 0; i < NUM_THREADS; i++)
 	{
 		int * u = new int(i);
-		j[i] = new threaddata(u, x, y);
+		j[i] = new threaddata;
+		j[i]->x = x;
+		j[i]->y = y;
+		j[i]->threadid = u;
 		j[i]->lock = lck;
 
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) j[i] );
