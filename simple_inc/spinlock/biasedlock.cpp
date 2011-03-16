@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sched.h>
 #include <stdio.h>
+#include "../constants.h"
+
 
 unsigned long long start;
 
@@ -19,31 +21,23 @@ rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
 
 void foo(threaddata * td)
 {
-	if(*(td->threadid) == 0)
+	if(*td->threadid == 0)
 	{
-		std::cout << "owner" << *(td->threadid) << std::endl;
-		for(int i = 0; i < 1000000000; i++)
+		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 			spinlock::lockN(&td->lock->n);
-			*(td->x) = (*td->x) + 1;
+			*td->x = *td->x + 1;
 			spinlock::unlockN(&td->lock->n);
 		}
-		std::cout << "dom thread done" << std::endl;
 	}
 	else
 	{
-//		timespec * t = new timespec;
-//		t->tv_nsec = 1;
-		for(int i = 0; i < 33333333; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			spinlock::lockN(&td->lock->n);
-			*(td->x) = (*td->x) + 1;
+			*td->x = *td->x + 1;
 			spinlock::unlockN(&td->lock->n);
-//			usleep(100);
-//			nanosleep(t,NULL);	
 		}
-		std::cout << "time: " << get_time() - start << std::endl;
-		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 

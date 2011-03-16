@@ -4,8 +4,12 @@
 #include <iostream>
 #include <sched.h>
 #include <stdio.h>
+#include "../constants.h"
+#include "/usr/local/papi/include/papi.h"
 
 unsigned long long start;
+
+long long ch=0, cm=0;
 
 /* timing code */
 unsigned long long get_time()
@@ -27,10 +31,20 @@ inline void noop(int * y, Lock * l)
 {}
 inline void incy (int * y, Lock * l)
 {
-	(*y)++;
+	#ifdef CACHE_MISSES
+	int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
+	PAPI_start_counters(events, 2);
+	#endif
+	(*y) = (*y) + 1;
 	l->func = NULL;
 	l->done = 1;
 	asm volatile("mfence");
+	#ifdef CACHE_MISSES
+	long long values[2];
+	PAPI_read_counters(values, 2);
+	cm += values[0];
+	ch += values[1];
+	#endif
 }
 
 inline void biased_lock(Lock * l, int * i)
@@ -48,8 +62,13 @@ void foo(threaddata * td)
 	if(*(td->threadid) == 0)
 	{
 		std::cout << "owner" << *(td->threadid) << std::endl;
-		for(int i = 0; i < 1000000000; i++)
+//		#ifdef CACHE_MISSES
+//		int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
+//		PAPI_start_counters(events, 2);
+//		#endif
+		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
+			if(i == 0) std::cout << &i << std::endl;
 		//	biased_lock_owner(td->lock, td->threadid);
 			*(td->x) = (*td->x) + 1;
 			if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
@@ -57,14 +76,21 @@ void foo(threaddata * td)
 	//		biased_unlock_owner(td);
 		}
 		std::cout << "dom thread done" << std::endl;
+//		#ifdef CACHE_MISSES
+//		long long values[2];
+//		PAPI_read_counters(values, 2);
+//		std::cout << "L1 Data Cache Misses: " << values[0] << std::endl;
+//		std::cout << "L1 Data Cache Hits: " << values[1] << std::endl;
+//		std::cout << "L1 Data Cache Hit Rate: " << (double)values[1]/((double)values[1] + (double)values[0]) << std::endl;
+//		#endif
 		std::cout << *td->x << std::endl;
-		while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
+		//while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
 	}
 	else
 	{
 		timespec * t = new timespec;
 		t->tv_nsec = 10000;
-		for(int i = 0; i < 33333333; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock(td->lock, td->threadid);
 			td->lock->done = 0;
@@ -81,7 +107,7 @@ void foo(threaddata * td)
 }	
 
 
-#define NUM_THREADS 4	
+#define NUM_THREADS 4
 int main()
 {
 	pthread_t threads[NUM_THREADS];
@@ -89,6 +115,9 @@ int main()
 	Lock * lck = new Lock;
 	lck->func = NULL;
 	lck->done = 1;
+
+	int * wat = new int(1);
+	int * wat2 = new int(1);
 
 	std::cout << &lck->n <<std::endl;
 
@@ -128,5 +157,10 @@ int main()
 
 	std::cout << "time: " << end - start << std::endl;
 
+	#ifdef CACHE_MISSES
+	std::cout << "L1 Data Cache Misses: " << cm << std::endl;
+	std::cout << "L1 Data Cache Hits: " << ch << std::endl;
+	std::cout << "L1 Data Cache Hit Rate: " << (double)ch/(double)(cm+ch) << std::endl;
+	#endif
 	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }

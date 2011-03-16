@@ -22,18 +22,28 @@ rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
 void foo(threaddata * td)
 {
 	qnode * I = new qnode;
-	
-	for(int i = 0; i < 100000000; i++)
+	if(*td->threadid == 0)
 	{
-		acquire_lock(td->L, I);
-		*td->x = *td->x + 1;
-		release_lock(td->L, I);
+		for(int i = 0; i < 1000000000; i++)
+		{
+			acquire_lock(td->L, I);
+			*td->x = *td->x + 1;
+			release_lock(td->L, I);
+		}
 	}
-	
+	else
+	{
+		for(int i = 0; i < 100000; i++)
+		{
+			acquire_lock(td->L, I);
+			*td->x = *td->x + 1;
+			release_lock(td->L, I);
+		}
+	}	
 }	
 
 
-#define NUM_THREADS 4	
+#define NUM_THREADS 128	
 int main()
 {
 	pthread_t threads[NUM_THREADS];

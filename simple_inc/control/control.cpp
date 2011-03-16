@@ -1,6 +1,6 @@
 #include <iostream>
 #include <pthread.h>
-
+#include "../constants.h"
 
 /* timing code */
 unsigned long long get_time()
@@ -14,7 +14,8 @@ rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
 
 void foo(int * x)
 {
-	for(int i = 0; i < 1000000000; i++)
+	int num = DOM_ACCESSES + NON_DOM_ACCESSES*3;
+	for(int i = 0; i < num; i++)
 	{
 		*(x) = *(x) + 1;
 	}

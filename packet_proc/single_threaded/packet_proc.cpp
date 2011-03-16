@@ -1,11 +1,13 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <map>
 
 #include "packet.h"
 
 #define NUM_THREADS 4
+#define LINES 1000000
 int main(int argc, char* argv[])
 {
 	//allocate mem for NUM_THREADS-1 ring queues for packets(how big?)
@@ -21,19 +23,30 @@ int main(int argc, char* argv[])
 	
 	if(argc > 1)
 	{
+		std::string lines[LINES];
 		std::map <int, Fragment **> * f = new std::map<int, Fragment **>();
 		std::ifstream input(argv[1]);
 	
 		if(input.is_open())	
 		{
-			while(!input.eof())
+			for (int j = 0; j < LINES; j++)
  			{
+				getline(input, lines[j]);
+			}
+
+			//start timing here
+			for (int j = 0; j < LINES; j++)
+			{
+				std::stringstream ss;
+				ss.clear();
+				ss.str(lines[j]);
+
 				int s,d,id,fn,n;
 				std::string c;
 				
 				s = d = id = fn = n = 0;
 				
-				input >> s >> d >> id >> fn >> n >> c;
+				ss >> s >> d >> id >> fn >> n >> c;
 
 			//	std::cout << s << " " << d << " " << id << " " << fn << " " << n << " " << c << std::endl;
 
@@ -65,5 +78,4 @@ int main(int argc, char* argv[])
 			std::cout << "error" << std::endl;
 		}
 	}
-	
 }

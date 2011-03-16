@@ -9,7 +9,7 @@ typedef struct _qnode
 	bool locked;
 } qnode;
 
-inline void acquire_lock(qnode ** L, qnode * I)
+void acquire_lock(qnode ** L, qnode * I)
 {
 	I->next = NULL;
 	qnode * predecessor = __sync_lock_test_and_set(L, I); //same as atomic fetch and store??
@@ -18,18 +18,18 @@ inline void acquire_lock(qnode ** L, qnode * I)
 	{
 		I->locked = true;
 		predecessor->next = I;
-		while(I->locked) { asm volatile("pause"); }
+		while(I->locked) ;
 	}
 }
 
-inline void release_lock (qnode ** L, qnode * I)
+void release_lock (qnode ** L, qnode * I)
 {
 	if(I->next == NULL)
 	{
 		if(CAS(L, I, NULL))
 			return;
 
-		while(I->next == NULL) {asm volatile ("pause");}
+		while(I->next == NULL) ; 
 	}
 	I->next->locked = false;
 }

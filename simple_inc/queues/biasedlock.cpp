@@ -3,10 +3,9 @@
 #include <iostream>
 #include "myqueue.h"
 #include "spinlock.h"
-#include <boost/thread/thread.hpp> 
-#include <boost/thread.hpp> 
 #include <sched.h>
 #include <stdio.h>
+#include "../constants.h"
 
 unsigned long long start;
 
@@ -51,7 +50,7 @@ void foo(threaddata * td)
 	if(*(td->threadid) == 0)
 	{
 		std::cout << "owner" << *(td->threadid) << std::endl;
-		for(int i = 0; i < 1000000000; i++)
+		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
 			*(td->x) = (*td->x) + 1;
@@ -66,7 +65,7 @@ void foo(threaddata * td)
 	{
 		timespec * t = new timespec;
 		t->tv_nsec = 10000;
-		for(int i = 0; i < 33333333; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock(td->lock, td->threadid);
 			//asm volatile ("mfence");i

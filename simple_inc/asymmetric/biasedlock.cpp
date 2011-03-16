@@ -1,12 +1,16 @@
 #include <sys/types.h>
 #include "biasedlock.h"
 #include "../../lib/spinlock.h"
-#include "mcs.h"
+#include "../../lib/mcs.h"
+#include "../constants.h"
 #include <iostream>
 #include <sched.h>
 #include <stdio.h>
+#include "/usr/local/papi/include/papi.h"
 
 unsigned long long start;
+
+long long cm=0, ch=0;
 
 /* timing code */
 unsigned long long get_time()
@@ -27,6 +31,7 @@ rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
 		td->lock->grant = true;\
 	}
 
+
 #define biased_lock() \
 	spinlock::lockN(&(td->lock->n)); \
 	td->lock->request = true; \
@@ -41,7 +46,11 @@ void foo(threaddata * td)
 	if(*(td->threadid) == 0)
 	{
 		std::cout << "owner" << *(td->threadid) << std::endl;
-		for(int i = 0; i < 1000000000; i++)
+//		#ifdef CACHE_MISSES
+//		int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
+//		PAPI_start_counters(events, 2);
+//		#endif
+		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 			biased_lock_owner();
 		
@@ -50,6 +59,14 @@ void foo(threaddata * td)
 			biased_unlock_owner();		
 	
 		}
+//		#ifdef CACHE_MISSES
+//		long long values[2];
+//		PAPI_read_counters(values, 2);
+//		std::cout << "L1 Data Cache Misses: " << values[0] << std::endl;
+//		std::cout << "L1 Data Cache Hits: " << values[1] << std::endl;
+//		std::cout << "L1 Data Cache Hit Rate: " << (double)values[1]/((double)values[1] + (double)values[0]) << std::endl;
+//		#endif
+//		std::cout << *td->x << std::endl;
 		std::cout << "dom thread done" << std::endl;
 		std::cout << *td->x << std::endl;
 /*		while(1)
@@ -62,12 +79,21 @@ void foo(threaddata * td)
 		qnode * I = new qnode;
 		timespec * t = new timespec;
 		t->tv_nsec = 1;
-		for(int i = 0; i < 3333333; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock();
 
+			#ifdef CACHE_MISSES
+			int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
+			PAPI_start_counters(events, 2);
+			#endif
 			*(td->x) = (*td->x) + 1;
-
+			#ifdef CACHE_MISSES
+			long long values[2];
+			PAPI_read_counters(values, 2);
+			cm += values[0];
+			ch += values[1];			
+			#endif
 			biased_unlock();
 //			nanosleep(t,NULL);	
 		}
@@ -115,5 +141,10 @@ int main()
 
 	std::cout << "time: " << end-start << std::endl;
 
+	#ifdef CACHE_MISSES
+	std::cout << "L1 Data Cache Misses: " << cm << std::endl;
+	std::cout << "L1 Data Cache Hits: " << ch << std::endl;
+	std::cout << "L1 Data Cache Hit Rate: " << (double)ch/(double)(cm+ch) << std::endl;
+	#endif
 	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }
