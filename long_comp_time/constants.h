@@ -1,0 +1,15 @@
+#define DOM_ACCESSES 100000000
+
+#if NNPNNN
+#define NON_DOM_ACCESSES 333
+#elif NNPNN
+#define NON_DOM_ACCESSES 3333
+#elif NNPN
+#define NON_DOM_ACCESSES 33333
+#elif NN
+#define NON_DOM_ACCESSES 333333
+#elif N
+#define NON_DOM_ACCESSES 3333333
+#else
+#define NON_DOM_ACCESSES 0
+#endif

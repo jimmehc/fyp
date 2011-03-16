@@ -1,0 +1,65 @@
+nnpnnn
+asymmetric_var
+owner0
+time: 3223824
+thread 1 done
+time: 9620320
+thread 2 done
+time: 13967344
+thread 3 done
+dom thread done
+1000009999
+time: 76687600872
+x: 1000009999 y: 0
+nnpnn
+asymmetric_var
+owner0
+time: 27733496
+thread 1 done
+time: 170005216
+thread 3 done
+time: 172391968
+thread 2 done
+dom thread done
+1000099999
+time: 77076179944
+x: 1000099999 y: 0
+nnpn
+asymmetric_var
+owner0
+time: 1435258920
+thread 1 done
+time: 1520355816
+thread 2 done
+time: 1606804272
+thread 3 done
+dom thread done
+1000999999
+time: 78493797152
+x: 1000999999 y: 0
+nn
+asymmetric_var
+owner0
+time: 10701724960
+thread 3 done
+time: 12495571272
+thread 2 done
+time: 16385400880
+thread 1 done
+dom thread done
+1009999999
+time: 92285060048
+x: 1009999999 y: 0
+n
+asymmetric_var
+owner0
+time: 120931159992
+thread 3 done
+time: 126382628928
+thread 2 done
+time: 167344077120
+thread 1 done
+dom thread done
+1099999999
+time: 236102378088
+x: 1099999999 y: 0
