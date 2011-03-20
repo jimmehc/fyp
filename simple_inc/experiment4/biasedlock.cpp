@@ -26,7 +26,7 @@ inline void biased_unlock_owner(threaddata * td)
 
 inline void noop(int * y, Lock * l)
 {}
-inline void incy (int * const y, Lock * l)
+inline void incy (int *  y, Lock * l)
 {
 	l->func = NULL;
 	asm volatile("mfence");
@@ -48,17 +48,18 @@ void foo(threaddata * td)
 {
 	if(*(td->threadid) == 0)
 	{
-		std::cout << "owner" << *(td->threadid) << std::endl;
+//		std::cout << "owner" << *(td->threadid) << std::endl;
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
+			if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
 			*(td->x) = (*td->x) + 1;
 			if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
 
 	//		biased_unlock_owner(td);
 		}
 		std::cout << "dom thread done" << std::endl;
-		std::cout << *td->x << std::endl;
+//		std::cout << *td->x << std::endl;
 //		while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
 	}
 	else
@@ -76,8 +77,8 @@ void foo(threaddata * td)
 //			biased_unlock(td->lock, td->threadid);
 		//	nanosleep(t,NULL);
 		}
-		std::cout << "time: " << get_time() - start << std::endl;
-		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
+//		std::cout << "time: " << get_time() - start << std::endl;
+//		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 
@@ -96,16 +97,16 @@ int main()
 		padding[i] = new int(0);*/
 	
 	threaddata * j[NUM_THREADS];
-	int * const x = new int(0);
-	int * const y = new int(0);
+	int *  x = new int(0);
+	int *  y = new int(0);
 
 	void (*fp)(int * y, Lock * l) = &incy;
 
-	std::cout << "lck: " << lck << std::endl;
+/*	std::cout << "lck: " << lck << std::endl;
 	std::cout << "lck->func: " << lck->func << std::endl;
 	std::cout << "incy: " << &fp << std::endl;
 	std::cout << "x: " << x << std::endl;
-	std::cout << "y: " << y << std::endl;
+	std::cout << "y: " << y << std::endl;*/
 	
 	start = get_time();
 	for(int i = 0; i < NUM_THREADS; i++)
@@ -123,5 +124,5 @@ int main()
 
 	std::cout << "time: " << end - start << std::endl;
 
-	std::cout << "x: " << *x << " y: " << *y << std::endl;
+//	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }

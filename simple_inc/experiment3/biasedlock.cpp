@@ -49,7 +49,7 @@ void foo(threaddata * td)
 {
 	if(*(td->threadid) == 0)
 	{
-		std::cout << "owner" << *(td->threadid) << std::endl;
+//		std::cout << "owner" << *(td->threadid) << std::endl;
 		#ifdef CACHE_MISSES
 		int events[1] = {PAPI_L1_DCM};
 		PAPI_start_counters(events, 1);
@@ -77,8 +77,8 @@ void foo(threaddata * td)
 		PAPI_read_counters(values, 1);
 		std::cout << "L1 Data Cache Misses: " << values[0] << std::endl;
 		#endif
-		std::cout << "dom thread done" << std::endl;
-		std::cout << *td->x << std::endl;
+//		std::cout << "dom thread done" << std::endl;
+//		std::cout << *td->x << std::endl;
 		//while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
 	}
 	else
@@ -96,8 +96,8 @@ void foo(threaddata * td)
 			biased_unlock(td->lock, td->threadid);
 		//	nanosleep(t,NULL);
 		}
-		std::cout << "time: " << get_time() - start << std::endl;
-		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
+//		std::cout << "time: " << get_time() - start << std::endl;
+//		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 
@@ -111,8 +111,6 @@ int main()
 	lck->token = 0;
 	lck->done = 1;
 
-	int * wat = new int(1);
-	int * wat2 = new int(1);
 
 /*	int* padding[64];
 
@@ -123,10 +121,10 @@ int main()
 	int * x = new int(0);
 	int * y = new int(0);
 
-	std::cout << "lck: " << lck << std::endl;
+/*	std::cout << "lck: " << lck << std::endl;
 	std::cout << "x: " << x << std::endl;
 	std::cout << "y: " << y << std::endl;
-	
+*/	
 	start = get_time();
 	for(int i = 0; i < NUM_THREADS; i++)
 	{
@@ -146,5 +144,5 @@ int main()
 
 	std::cout << "time: " << end - start << std::endl;
 
-	std::cout << "x: " << *x << " y: " << *y << std::endl;
+//	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }

@@ -45,7 +45,6 @@ void foo(threaddata * td)
 {
 	if(*(td->threadid) == 0)
 	{
-		std::cout << "owner" << *(td->threadid) << std::endl;
 //		#ifdef CACHE_MISSES
 //		int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
 //		PAPI_start_counters(events, 2);
@@ -67,8 +66,8 @@ void foo(threaddata * td)
 //		std::cout << "L1 Data Cache Hit Rate: " << (double)values[1]/((double)values[1] + (double)values[0]) << std::endl;
 //		#endif
 //		std::cout << *td->x << std::endl;
-		std::cout << "dom thread done" << std::endl;
-		std::cout << *td->x << std::endl;
+//		std::cout << "dom thread done" << std::endl;
+//		std::cout << *td->x << std::endl;
 /*		while(1)
 		{
 			biased_unlock_owner();
@@ -87,7 +86,7 @@ void foo(threaddata * td)
 			int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
 			PAPI_start_counters(events, 2);
 			#endif
-			*(td->x) = (*td->x) + 1;
+			*(td->y) = (*td->y) + 1;
 			#ifdef CACHE_MISSES
 			long long values[2];
 			PAPI_read_counters(values, 2);
@@ -97,8 +96,8 @@ void foo(threaddata * td)
 			biased_unlock();
 //			nanosleep(t,NULL);	
 		}
-		std::cout << "time: " << get_time() - start << std::endl;
-		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
+//		std::cout << "time: " << get_time() - start << std::endl;
+//		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 
@@ -146,5 +145,5 @@ int main()
 	std::cout << "L1 Data Cache Hits: " << ch << std::endl;
 	std::cout << "L1 Data Cache Hit Rate: " << (double)ch/(double)(cm+ch) << std::endl;
 	#endif
-	std::cout << "x: " << *x << " y: " << *y << std::endl;
+	//std::cout << "x: " << *x << " y: " << *y << std::endl;
 }

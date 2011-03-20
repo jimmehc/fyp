@@ -68,14 +68,15 @@ void foo(threaddata * td)
 //		#endif
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
-			if(i == 0) std::cout << &i << std::endl;
 		//	biased_lock_owner(td->lock, td->threadid);
+	//		if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
 			*(td->x) = (*td->x) + 1;
 			if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
 
 	//		biased_unlock_owner(td);
 		}
 		std::cout << "dom thread done" << std::endl;
+		std::cout << "time: " << get_time() - start << std::endl;
 //		#ifdef CACHE_MISSES
 //		long long values[2];
 //		PAPI_read_counters(values, 2);
@@ -89,7 +90,7 @@ void foo(threaddata * td)
 	else
 	{
 		timespec * t = new timespec;
-		t->tv_nsec = 10000;
+		t->tv_nsec = 1;
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock(td->lock, td->threadid);
@@ -97,12 +98,12 @@ void foo(threaddata * td)
 			//asm volatile ("mfence");
 			td->lock->func = &incy;
 			asm volatile ("mfence");
-			while(!(td->lock->done));
+			while((!td->lock->done)){ asm volatile ("pause");}
 			biased_unlock(td->lock, td->threadid);
-		//	nanosleep(t,NULL);
+//			nanosleep(t,NULL);
 		}
-		std::cout << "time: " << get_time() - start << std::endl;
-		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
+//		std::cout << "time: " << get_time() - start << std::endl;
+//		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 
@@ -116,10 +117,10 @@ int main()
 	lck->func = NULL;
 	lck->done = 1;
 
-	int * wat = new int(1);
-	int * wat2 = new int(1);
+//	int * wat = new int(1);
+//	int * wat2 = new int(1);
 
-	std::cout << &lck->n <<std::endl;
+//	std::cout << &lck->n <<std::endl;
 
 /*	int* padding[64];
 
@@ -132,11 +133,11 @@ int main()
 
 	void (*fp)(int * y, Lock * l) = &incy;
 
-	std::cout << "lck: " << lck << std::endl;
+/*	std::cout << "lck: " << lck << std::endl;
 	std::cout << "lck->func: " << lck->func << std::endl;
 	std::cout << "incy: " << &fp << std::endl;
 	std::cout << "x: " << x << std::endl;
-	std::cout << "y: " << y << std::endl;
+	std::cout << "y: " << y << std::endl;*/
 	
 	start = get_time();
 	for(int i = 0; i < NUM_THREADS; i++)
@@ -162,5 +163,5 @@ int main()
 	std::cout << "L1 Data Cache Hits: " << ch << std::endl;
 	std::cout << "L1 Data Cache Hit Rate: " << (double)ch/(double)(cm+ch) << std::endl;
 	#endif
-	std::cout << "x: " << *x << " y: " << *y << std::endl;
+//	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }

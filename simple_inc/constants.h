@@ -10,6 +10,10 @@
 #define NON_DOM_ACCESSES 3333333
 #elif N
 #define NON_DOM_ACCESSES 33333333
+#elif E
+#define NON_DOM_ACCESSES 66666666
+#elif S
+#define NON_DOM_ACCESSES 77777777
 #else
 #define NON_DOM_ACCESSES 0
 #endif

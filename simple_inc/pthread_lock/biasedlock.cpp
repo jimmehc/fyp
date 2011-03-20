@@ -25,18 +25,18 @@ void foo(threaddata * td)
 	{
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
-			spinlock::lockN(&td->lock->n);
+			pthread_mutex_lock(td->m);
 			*td->x = *td->x + 1;
-			spinlock::unlockN(&td->lock->n);
+			pthread_mutex_unlock(td->m);
 		}
 	}
 	else
 	{
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
-			spinlock::lockN(&td->lock->n);
+			pthread_mutex_lock(td->m);
 			*td->x = *td->x + 1;
-			spinlock::unlockN(&td->lock->n);
+			pthread_mutex_unlock(td->m);
 		}
 	}
 }	
@@ -45,13 +45,8 @@ void foo(threaddata * td)
 int main()
 {
 	pthread_t threads[NUM_THREADS];
-	
-	int * flag = (int *) malloc(sizeof(int)*2);
-	flag[0] = flag[1] = 0;
-	int turn;
+	pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
 
-	Lock * lck = new Lock;
-	
 	threaddata j[NUM_THREADS];
 	int * x = new int(0);
 	int * y = new int(0);
@@ -62,7 +57,7 @@ int main()
 	{
 		j[i].x = x;
 		j[i].y = y;
-		j[i].lock = lck;
+		j[i].m = &mymutex;
 		j[i].threadid = new int(i);
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) &j[i] );
 	}	

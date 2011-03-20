@@ -9,6 +9,8 @@ nn:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNN
 n:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DN
+e:
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DE
 
 nnpnnnc:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPNNN -DCACHE_MISSES -L/usr/local/papi/lib -lpapi
@@ -31,5 +33,5 @@ nc:
 
 
 debug:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DDEBUG
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DDEBUG -DNNPNNN
 	

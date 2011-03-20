@@ -49,7 +49,6 @@ void foo(threaddata * td)
 	int el = 1;
 	if(*(td->threadid) == 0)
 	{
-		std::cout << "owner" << *(td->threadid) << std::endl;
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
@@ -75,8 +74,8 @@ void foo(threaddata * td)
 					
 	//		biased_unlock_owner(td);
 		}
-		std::cout << "dom thread done" << std::endl;
-		std::cout << *td->x << std::endl;
+//		std::cout << "dom thread done" << std::endl;
+//		std::cout << *td->x << std::endl;
 	}
 	else
 	{
@@ -91,8 +90,8 @@ void foo(threaddata * td)
 			biased_unlock(td->lock, td->threadid);
 		//	nanosleep(t,NULL);
 		}
-		std::cout << "time: " << get_time() - start << std::endl;
-		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
+//		std::cout << "time: " << get_time() - start << std::endl;
+//		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 
@@ -129,5 +128,5 @@ int main()
 
 	std::cout << "time: " << end - start << std::endl;
 
-	std::cout << "x: " << *x << " y: " << *y << std::endl;
+//	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }
