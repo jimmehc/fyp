@@ -2,6 +2,7 @@
 #include "biasedlock.h"
 #include "../../lib/spinlock.h"
 #include "../../lib/mcs.h"
+#include "../../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
 #include <sched.h>
@@ -12,15 +13,6 @@ unsigned long long start;
 
 long long cm=0, ch=0;
 
-/* timing code */
-unsigned long long get_time()
-{
- unsigned long lo,hi;
- __asm__ __volatile__("xorl %%eax,%%eax\n\
-cpuid\n\
-rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
- return ((unsigned long long)lo) + (unsigned long long)(hi<<32ULL);
-}
 
 #define biased_lock_owner() while(td->lock->grant){asm volatile ("pause");}
 #define biased_unlock_owner()	\
@@ -86,7 +78,9 @@ void foo(threaddata * td)
 			int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
 			PAPI_start_counters(events, 2);
 			#endif
+
 			*(td->y) = (*td->y) + 1;
+
 			#ifdef CACHE_MISSES
 			long long values[2];
 			PAPI_read_counters(values, 2);

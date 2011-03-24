@@ -11,6 +11,8 @@ n:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DN
 e:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DE
+s:
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DS
 
 nnpnnnc:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPNNN -DCACHE_MISSES -L/usr/local/papi/lib -lpapi

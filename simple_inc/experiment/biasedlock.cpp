@@ -9,7 +9,7 @@
 
 unsigned long long start;
 
-long long ch=0, cm=0;
+//long long ch=0, cm=0;
 
 /* timing code */
 unsigned long long get_time()
@@ -61,7 +61,7 @@ void foo(threaddata * td)
 {
 	if(*(td->threadid) == 0)
 	{
-		std::cout << "owner" << *(td->threadid) << std::endl;
+//		std::cout << "owner" << *(td->threadid) << std::endl;
 //		#ifdef CACHE_MISSES
 //		int events[2] = {PAPI_L1_DCM, PAPI_L1_DCH};
 //		PAPI_start_counters(events, 2);
@@ -75,8 +75,8 @@ void foo(threaddata * td)
 
 	//		biased_unlock_owner(td);
 		}
-		std::cout << "dom thread done" << std::endl;
-		std::cout << "time: " << get_time() - start << std::endl;
+//		std::cout << "dom thread done" << std::endl;
+//		std::cout << "time: " << get_time() - start << std::endl;
 //		#ifdef CACHE_MISSES
 //		long long values[2];
 //		PAPI_read_counters(values, 2);
@@ -84,7 +84,7 @@ void foo(threaddata * td)
 //		std::cout << "L1 Data Cache Hits: " << values[1] << std::endl;
 //		std::cout << "L1 Data Cache Hit Rate: " << (double)values[1]/((double)values[1] + (double)values[0]) << std::endl;
 //		#endif
-		std::cout << *td->x << std::endl;
+//		std::cout << *td->x << std::endl;
 		//while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
 	}
 	else

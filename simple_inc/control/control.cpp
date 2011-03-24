@@ -40,5 +40,5 @@ int main()
 	unsigned long long end = get_time();
 	std::cout << "time: " << end - start << std::endl;
 
-	std::cout << "x: " << *x << " y: " << *y << std::endl;
+//	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }

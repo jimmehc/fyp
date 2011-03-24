@@ -3,9 +3,10 @@
 use Switch;
 
 my @algorithms = ("spinlock", "pthread_lock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
-my @algorithms = ("experiment2", "experiment4", "queues", "message_passing");
-#my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "n");
-my @options = ("n");
+#my @algorithms = ("spinlock", "message_passing", "asymmetric", "asymmetric_var","queues");
+#my @algorithms = ("asymmetric", "asymmetric_var","queues", "message_passing");
+my @options = ("nnpnnn", "nnpnn", "nnpn", "nn");
+#my @options = ("n");
 
 foreach $option (@options)
 {

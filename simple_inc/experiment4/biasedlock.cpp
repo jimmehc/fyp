@@ -52,13 +52,13 @@ void foo(threaddata * td)
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
-			if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
+//			if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
 			*(td->x) = (*td->x) + 1;
 			if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
 
 	//		biased_unlock_owner(td);
 		}
-		std::cout << "dom thread done" << std::endl;
+//		std::cout << "dom thread done" << std::endl;
 //		std::cout << *td->x << std::endl;
 //		while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
 	}
