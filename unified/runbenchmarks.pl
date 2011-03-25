@@ -3,10 +3,11 @@
 use Switch;
 
 my @algorithms = ("spinlock", "pthread_lock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
+#my @algorithms = ("experiment3");
 #my @algorithms = ("spinlock", "message_passing", "asymmetric", "asymmetric_var","queues");
 #my @algorithms = ("asymmetric", "asymmetric_var","queues", "message_passing");
-my @options = ("nnpnnn", "nnpnn", "nnpn", "nn");
-#my @options = ("n");
+my @options = ("n", "e");
+#my @options = ("s");
 
 my $delay;
 if(@ARGV >= 1)
@@ -18,6 +19,8 @@ else
 	$delay = 0;
 }
 
+my %arr;
+
 foreach $option (@options)
 {
 	switch($option)
@@ -27,6 +30,7 @@ foreach $option (@options)
 		case "nnpn" { print "99.9% Dominance"; }
 		case "nn" { print "99% Dominance"; }
 		case "n" { print "90% Dominance"; }
+		case "s" { print "80% Dominance"; }
 	}
 
 	print "\n";
@@ -47,8 +51,24 @@ foreach $option (@options)
 			case "message_passing" { print "Queue of Messages"; }
 		}
 		print "\n";
-		print `make DELAY=$delay -C$algorithm $option`;
-		print `./$algorithm/asymmetric`;
+		`make DELAY=$delay -C$algorithm $option`;
+		`./$algorithm/asymmetric` =~ m/time: (.*)/;
+		$arr{$algorithm}{$option} = $1;
+		print $arr{$algorithm}{$option};
+		print "\n";
+	}
+	print "\n";
+
+}
+foreach $algorithm (@algorithms)
+{
+	print $algorithm;
+	print " ";
+	foreach $option (@options)
+	{
+		print $arr{$algorithm}{$option};
+		print " ";
 	}
 	print "\n";
 }
+
