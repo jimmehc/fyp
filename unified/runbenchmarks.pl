@@ -3,10 +3,10 @@
 use Switch;
 
 my @algorithms = ("spinlock", "pthread_lock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
-#my @algorithms = ("experiment3");
+#my @algorithms = ("control", "controlwspin");
 #my @algorithms = ("spinlock", "message_passing", "asymmetric", "asymmetric_var","queues");
 #my @algorithms = ("asymmetric", "asymmetric_var","queues", "message_passing");
-my @options = ("n", "e");
+my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n", "ef", "e", "sf", "s");
 #my @options = ("s");
 
 my $delay;
@@ -29,8 +29,12 @@ foreach $option (@options)
 		case "nnpnn" { print "99.99% Dominance"; }
 		case "nnpn" { print "99.9% Dominance"; }
 		case "nn" { print "99% Dominance"; }
+		case "nf" { print "95% Dominance"; }
 		case "n" { print "90% Dominance"; }
-		case "s" { print "80% Dominance"; }
+		case "ef" { print "85% Dominance"; }
+		case "e" { print "80% Dominance"; }
+		case "sf" { print "75% Dominance"; }
+		case "s" { print "70% Dominance"; }
 	}
 
 	print "\n";

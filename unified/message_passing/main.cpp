@@ -1,4 +1,4 @@
-#include "myqueue.h"
+#include "../../lib/myqueue.h"
 #include <iostream>
 
 int main()

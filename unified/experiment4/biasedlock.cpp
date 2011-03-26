@@ -55,7 +55,7 @@ void foo(threaddata * td)
 
 	//		biased_unlock_owner(td);
 		}
-//		std::cout << "dom thread done" << std::endl;
+		std::cerr << "dom thread done" << std::endl;
 //		std::cout << *td->x << std::endl;
 //		while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
 	}
@@ -114,8 +114,11 @@ int main()
 
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) j[i] );
 	}	
-	for(int i = 0; i < NUM_THREADS; i++)
-		pthread_join(threads[i], NULL);
+	pthread_join(threads[0], NULL);	//wait for dom thread
+
+	for(int i = 1; i < NUM_THREADS; i++)
+		if(pthread_tryjoin_np(threads[i], NULL))
+			std::cerr << "Tipping point hit, non dom threads not complete, x: " << *x << std::endl;
 
 	unsigned long long end = get_time();
 

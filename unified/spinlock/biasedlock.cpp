@@ -17,6 +17,9 @@ void foo(threaddata * td)
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 			spinlock::lockN(&td->lock->n);
+			#ifdef DELAY
+			for(int j = 0; j < DELAY; j++) ;
+			#endif	
 			*td->x = *td->x + 1;
 			spinlock::unlockN(&td->lock->n);
 		}
@@ -26,6 +29,9 @@ void foo(threaddata * td)
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			spinlock::lockN(&td->lock->n);
+			#ifdef DELAY
+			for(int j = 0; j < DELAY; j++) ;
+			#endif	
 			*td->x = *td->x + 1;
 			spinlock::unlockN(&td->lock->n);
 		}
@@ -35,6 +41,7 @@ void foo(threaddata * td)
 #define NUM_THREADS 4			
 int main()
 {
+	std::cerr << "TEST" << std::endl;
 	pthread_t threads[NUM_THREADS];
 	
 	int * flag = (int *) malloc(sizeof(int)*2);
