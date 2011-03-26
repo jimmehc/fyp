@@ -19,7 +19,7 @@ inline void noop(int * y, Lock * l)
 {}
 inline void incy (int * y, Lock * l)
 {
-	#ifdef DELAY
+	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
 	#endif	
 	(*y) = (*y) + 1;
@@ -47,7 +47,7 @@ void foo(threaddata * td)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
 	//		if(td->lock->func != NULL) td->lock->func (td->x, td->lock);
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*(td->x) = (*td->x) + 1;

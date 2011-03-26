@@ -39,7 +39,7 @@ void foo(threaddata * td)
 		{
 //			biased_lock_owner();
 			
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 		
@@ -64,7 +64,7 @@ void foo(threaddata * td)
 		{
 			biased_lock();
 
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 

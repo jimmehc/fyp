@@ -26,7 +26,7 @@ void foo(threaddata * td)
 		for(int i = 0; i < 1000000000; i++)
 		{
 			acquire_lock(td->L, I);
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;
@@ -38,7 +38,7 @@ void foo(threaddata * td)
 		for(int i = 0; i < 100000; i++)
 		{
 			acquire_lock(td->L, I);
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;

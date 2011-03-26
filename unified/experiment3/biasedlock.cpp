@@ -43,7 +43,7 @@ void foo(threaddata * td)
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*(td->x) = (*td->x) + 1;
@@ -52,7 +52,7 @@ void foo(threaddata * td)
 				switch(td->lock->token)
 				{
 					case 1:
-						#ifdef DELAY
+						#if DELAY
 						for(int j = 0; j < DELAY; j++) ;
 						#endif	
 						*td->x = *td->x + 1;

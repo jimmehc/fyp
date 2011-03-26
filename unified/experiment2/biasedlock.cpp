@@ -21,7 +21,7 @@ inline void incy (int * const y, Lock * l)
 {
 	l->func = NULL;
 	asm volatile("mfence");
-	#ifdef DELAY
+	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
 	#endif	
 	(*y)++;
@@ -46,7 +46,7 @@ void foo(threaddata * td)
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 		//	biased_lock_owner(td->lock, td->threadid);
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*(td->x) = (*td->x) + 1;

@@ -11,7 +11,7 @@ void foo(int * x)
 	for(int i = 0; i < num; i++)
 	{
 		spinlock::lockN(&lck);
-		#ifdef DELAY
+		#if DELAY
 		for(int j = 0; j < DELAY; j++) ;
 		#endif	
 		*(x) = *(x) + 1;

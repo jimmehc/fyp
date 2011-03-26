@@ -17,7 +17,7 @@ void foo(threaddata * td)
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 			pthread_mutex_lock(td->m);
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;
@@ -29,7 +29,7 @@ void foo(threaddata * td)
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			pthread_mutex_lock(td->m);
-			#ifdef DELAY
+			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;
