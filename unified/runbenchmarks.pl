@@ -2,7 +2,6 @@
 
 use Switch;
 
-<<<<<<< HEAD
 my @algorithms = ("spinlock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
 my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");
 #, "ef", "e", "sf", "s");
