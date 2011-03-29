@@ -92,6 +92,8 @@ int main()
 	qnode ** lck = new qnode*;
 	
 	Lock * lock = new Lock;
+
+	pthread_spin_init(&lck->n, PTHREAD_PROCESS_PRIVATE);
 	lock->request = false;
 	lock->grant = false;
 	

@@ -2,11 +2,12 @@
 
 use Switch;
 
-my @algorithms = ("spinlock", "pthread_lock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
+#my @algorithms = ("spinlock", "pthread_lock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
 #my @algorithms = ("control", "controlwspin");
-#my @algorithms = ("spinlock", "message_passing", "asymmetric", "asymmetric_var","queues");
+my @algorithms = ("spinlock", "asymmetric", "asymmetric_var", "queues", "message_passing");
 #my @algorithms = ("asymmetric", "asymmetric_var","queues", "message_passing");
-my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n", "ef", "e", "sf", "s");
+#my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");#, 
+my @options = ("ef", "e", "sf", "s");
 #my @options = ("s");
 
 my $delay;

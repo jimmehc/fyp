@@ -13,7 +13,7 @@ class Lock
 {
 	public:
 	//Lock2 t;
-	int n; //LockN
+	pthread_spinlock_t n; //LockN
 	int done;
 	myqueue<int> * q;
 };

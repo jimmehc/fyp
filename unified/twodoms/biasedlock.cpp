@@ -25,7 +25,7 @@ inline void biased_unlock_owner(Lock * l, int * i)
 
 inline void biased_lock(Lock * l, int * i)
 {
-	spinlock::lockN(&(l->n));
+	pthread_spin_lock(&(l->n));
 	l->request = true;
 	while(!l->grant);
 }
@@ -34,7 +34,7 @@ void biased_unlock(Lock * l, int * i)
 {
 	asm volatile ("mfence");
 	l->grant = false;
-	spinlock::unlockN(&(l->n));
+	pthread_spin_unlock(&(l->n));
 }
 
 void foo(threaddata * td)
@@ -109,6 +109,8 @@ int main()
 	int turn;
 
 	Lock * lck = new Lock;
+
+	pthread_spin_init(&lck->n, PTHREAD_PROCESS_PRIVATE);
 	lck->request = false;
 	lck->grant = false;
 	lck->flag[0] = false;

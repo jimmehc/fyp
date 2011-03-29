@@ -10,7 +10,7 @@
 
 typedef struct lll {
 	//Lock2 t;
-	int n; //LockN
+	pthread_spinlock_t n; //LockN
 	int done;
 	int  token;
 } Lock;

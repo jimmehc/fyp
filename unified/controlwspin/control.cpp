@@ -10,12 +10,12 @@ void foo(int * x)
 	int num = DOM_ACCESSES + NON_DOM_ACCESSES*3;
 	for(int i = 0; i < num; i++)
 	{
-		spinlock::lockN(&lck);
+		pthread_spin_lock(&lck);
 		#if DELAY
 		for(int j = 0; j < DELAY; j++) ;
 		#endif	
 		*(x) = *(x) + 1;
-		spinlock::unlockN(&lck);
+		pthread_spin_unlock(&lck);
 	}
 }	
 

@@ -8,7 +8,7 @@
 
 typedef struct {
 	//Lock2 t;
-	int n; //LockN
+	pthread_spinlock_t n; //LockN
 	int t;
 	bool request;
 	bool grant;

@@ -10,7 +10,7 @@
 
 typedef struct lll {
 	//Lock2 t;
-	int n; //LockN
+	pthread_spinlock_t n; //LockN
 	void (*func)(int * const y, struct lll * l);
 } Lock;
 
