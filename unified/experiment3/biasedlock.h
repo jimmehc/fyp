@@ -3,7 +3,6 @@
 
 #include <sched.h>
 #include <sys/types.h>
-#include <boost/interprocess/detail/atomic.hpp>
 #include <unistd.h>
 
 
@@ -23,6 +22,7 @@ class threaddata
 	int * y;
 	Lock *lock;
 	threaddata():x(NULL), y(NULL){}
+	bool done;
 };
 
 inline void biased_lock(Lock * l, int * i) __attribute__((always_inline));
