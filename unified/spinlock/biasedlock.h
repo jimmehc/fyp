@@ -3,7 +3,6 @@
 
 #include <sched.h>
 #include <sys/types.h>
-#include <boost/interprocess/detail/atomic.hpp>
 #include <unistd.h>
 
 typedef struct {
