@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 typedef struct {
-	int n; //LockN
+	pthread_spinlock_t n; //LockN
 } Lock;
 
 typedef struct 

@@ -22,13 +22,13 @@ unsigned long long start;
 
 
 #define biased_lock() \
-	spinlock::lockN(&(td->lock->n)); \
+	pthread_spin_lock(&(td->lock->n)); \
 	td->lock->request = true; \
 	while(!td->lock->grant){ asm volatile ("pause"); }
 #define biased_unlock() \
 	asm volatile ("mfence"); \
 	td->lock->grant = false; \
-	spinlock::unlockN(&(td->lock->n));
+	pthread_spin_unlock(&(td->lock->n));
 
 void foo(threaddata * td)
 {
@@ -84,6 +84,8 @@ int main()
 	pthread_t threads[NUM_THREADS];
 	
 	Lock * lck = new Lock;
+
+	pthread_spin_init(&lck->n, PTHREAD_PROCESS_PRIVATE);
 	lck->request = false;
 	lck->grant = false;
 

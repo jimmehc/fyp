@@ -12,7 +12,7 @@ typedef struct {
 	//Lock2 t;
 	int * n1;
 	int * n2;
-	int n;
+	pthread_spinlock_t n;
 	bool request;
 	bool grant;
 } Lock;

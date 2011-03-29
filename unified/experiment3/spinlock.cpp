@@ -4,7 +4,7 @@
 
 #define CAS __sync_bool_compare_and_swap
 
-void spinlock::lockN (int * lck)
+void pthread_spin_lock (int * lck)
 {
 	int success = 0;
 	do
@@ -14,7 +14,7 @@ void spinlock::lockN (int * lck)
 	}while(!success);
 }
 
-void spinlock::unlockN (int * lck)
+void pthread_spin_unlock (int * lck)
 {
 	*lck = 0;
 }

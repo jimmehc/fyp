@@ -30,12 +30,12 @@ inline void incy (int * const y, Lock * l)
 
 inline void biased_lock(Lock * l, int * i)
 {
-	spinlock::lockN(&(l->n));
+	pthread_spin_lock(&(l->n));
 }
 
 inline void biased_unlock(Lock * l, int * i)
 {
-	spinlock::unlockN(&(l->n));
+	pthread_spin_unlock(&(l->n));
 }
 
 void foo(threaddata * td)
@@ -84,6 +84,8 @@ int main()
 	pthread_t threads[NUM_THREADS];
 	
 	Lock * lck = new Lock;
+
+	pthread_spin_init(&lck->n, PTHREAD_PROCESS_PRIVATE);
 	lck->q = new myqueue<void (*)(int*, Lock*)>;
 	lck->done = 1;
 

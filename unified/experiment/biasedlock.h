@@ -9,7 +9,7 @@
 
 typedef struct lll {
 	//Lock2 t;
-	int n; //LockN
+	pthread_spinlock_t n; //LockN
 	int done;
 	void (*func)(int * y, struct lll * l);
 } Lock;

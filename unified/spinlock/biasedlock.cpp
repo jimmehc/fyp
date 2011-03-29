@@ -16,25 +16,25 @@ void foo(threaddata * td)
 	{
 		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
-			spinlock::lockN(&td->lock->n);
+			pthread_spin_lock(&td->lock->n);
 			#if DELAY
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;
-			spinlock::unlockN(&td->lock->n);
+			pthread_spin_unlock(&td->lock->n);
 		}
 	}
 	else
 	{
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
-			spinlock::lockN(&td->lock->n);
+			pthread_spin_lock(&td->lock->n);
 			#if DELAY
 			std::cout << "?";
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;
-			spinlock::unlockN(&td->lock->n);
+			pthread_spin_unlock(&td->lock->n);
 		}
 	}
 }	
@@ -49,6 +49,8 @@ int main()
 	int turn;
 
 	Lock * lck = new Lock;
+
+	pthread_spin_init(&lck->n, PTHREAD_PROCESS_PRIVATE);
 	
 	threaddata j[NUM_THREADS];
 	int * x = new int(0);

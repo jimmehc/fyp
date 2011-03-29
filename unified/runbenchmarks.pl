@@ -2,13 +2,10 @@
 
 use Switch;
 
+<<<<<<< HEAD
 my @algorithms = ("spinlock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
-#my @algorithms = ("control", "controlwspin");
-#my @algorithms = ("spinlock", "message_passing", "asymmetric", "asymmetric_var","queues");
-#my @algorithms = ("asymmetric", "asymmetric_var","queues", "message_passing");
 my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");
 #, "ef", "e", "sf", "s");
-#my @options = ("nnpnnn");
 
 my $delay;
 if(@ARGV >= 1)
