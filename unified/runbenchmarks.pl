@@ -2,12 +2,13 @@
 
 use Switch;
 
-my @algorithms = ("spinlock", "pthread_lock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
+my @algorithms = ("spinlock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
 #my @algorithms = ("control", "controlwspin");
 #my @algorithms = ("spinlock", "message_passing", "asymmetric", "asymmetric_var","queues");
 #my @algorithms = ("asymmetric", "asymmetric_var","queues", "message_passing");
-my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n", "ef", "e", "sf", "s");
-#my @options = ("s");
+my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");
+#, "ef", "e", "sf", "s");
+#my @options = ("nnpnnn");
 
 my $delay;
 if(@ARGV >= 1)
@@ -56,8 +57,14 @@ foreach $option (@options)
 		}
 		print "\n";
 		`make DELAY=$delay -C$algorithm $option`;
-		`./$algorithm/asymmetric` =~ m/time: (.*)/;
-		$arr{$algorithm}{$option} = $1;
+		if(`./$algorithm/asymmetric` =~ m/time: (.*)/)
+		{
+			$arr{$algorithm}{$option} = $1;
+		}
+		else
+		{
+			$arr{$algorithm}{$option} = 0;
+		}
 		print $arr{$algorithm}{$option};
 		print "\n";
 	}
