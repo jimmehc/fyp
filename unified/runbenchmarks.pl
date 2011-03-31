@@ -1,19 +1,26 @@
 #!/usr/bin/perl
 
 use Switch;
-
-my @algorithms = ("spinlock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
-my @options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");
-#, "ef", "e", "sf", "s");
+my @algorithms = ("spinlock", "pthread_lock", "control", "asymmetric", "asymmetric_var", "experiment", "experiment2", "experiment3", "experiment4", "queues", "message_passing");
+my @options;
 
 my $delay;
-if(@ARGV >= 1)
+if(@ARGV >= 2)
 {
-	$delay = $ARGV[0];
+	if($ARGV[0] eq "l")
+	{
+		@options = ("ef", "e", "sf", "s");
+	}
+	else
+	{
+		@options = ("nnpnnn", "nnpnn");#, "nnpn", "nn", "nf","n");
+	}
+	$delay = $ARGV[1];
 }
 else
 {
 	$delay = 0;
+	@options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");
 }
 
 my %arr;
@@ -53,13 +60,16 @@ foreach $option (@options)
 		}
 		print "\n";
 		`make DELAY=$delay -C$algorithm $option`;
-		if(`./$algorithm/asymmetric` =~ m/time: (.*)/)
+	
+		$output = `./$algorithm/asymmetric`;
+		if($output =~ m/Tipping point/)
 		{
-			$arr{$algorithm}{$option} = $1;
+			$arr{$algorithm}{$option} = 0;
 		}
 		else
 		{
-			$arr{$algorithm}{$option} = 0;
+			$output =~ m/time: (.*)/;
+			$arr{$algorithm}{$option} = $1;
 		}
 		print $arr{$algorithm}{$option};
 		print "\n";
@@ -67,15 +77,77 @@ foreach $option (@options)
 	print "\n";
 
 }
+$machinename = `hostname -s`;
+$num = `ls -l results|wc -l` + 1;
+
+chomp($machinename);
+
+$filename = $machinename."_delay".$delay."_".$ARGV[0]."_".$num;
+
+print $filename;
+
+open FILE, ">","results/$filename.gr" or die "WAT";
+
+print FILE "=cluster;Spinlock(baseline);Pthread Mutex;Asymmetric(Vasuvedan);Asymmetric Variation;One Function Pointer;Asynchronous FP;Message Passing;FP Spinlock;Function Pointer Queue;Message Passing Queue;\n=table\nyformat=%gx\n=norotate\nylabel=Speedup\nxlabel=Dominance Percentage\n\n"; 
+
+
+print FILE "#";
 foreach $algorithm (@algorithms)
 {
-	print $algorithm;
-	print " ";
-	foreach $option (@options)
-	{
-		print $arr{$algorithm}{$option};
-		print " ";
-	}
-	print "\n";
+	print FILE $algorithm;
+	print FILE " ";
 }
 
+print FILE "\n";
+
+foreach $option (@options)
+{
+	switch($option)
+	{
+		case "nnpnnn" { print FILE "99.999"; }
+		case "nnpnn" { print FILE "99.99"; }
+		case "nnpn" { print FILE "99.9"; }
+		case "nn" { print FILE "99"; }
+		case "nf" { print FILE "95"; }
+		case "n" { print FILE "90"; }
+		case "ef" { print FILE "85"; }
+		case "e" { print FILE "80"; }
+		case "sf" { print FILE "75"; }
+		case "s" { print FILE "70"; }
+	}
+	print FILE " ";
+	foreach $algorithm (@algorithms)
+	{
+		if($algorithm ne "control")
+		{
+			if($arr{$algorithm}{$option} != 0)
+			{
+				print FILE $arr{"spinlock"}{$option}/$arr{$algorithm}{$option};
+			}
+			else
+			{
+				print FILE 0;
+			}
+			print FILE " ";
+		}
+	}
+	print FILE "\n";
+}
+close FILE;
+
+open FILE, ">","results/$filename.raw" or die "WAT";
+
+foreach $algorithm (@algorithms)
+{
+	print FILE $algorithm;
+	print FILE " ";
+	foreach $option (@options)
+	{
+		print FILE $arr{$algorithm}{$option};
+		print FILE " ";
+	}	
+	print FILE "\n";
+}
+close FILE;
+
+print `perl ../bargraph.pl -png results/$filename.gr > graphs/$filename.png`;
