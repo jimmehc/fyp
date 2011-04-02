@@ -1232,7 +1232,7 @@ if ($output eq "fig") {
 } elsif ($output eq "pdf") {
     $fig2dev = "$fig2dev_path -L pdf -n \"$title\"";
 } elsif ($output eq "png") {
-    $fig2dev = "$fig2dev_path -L png -m 2";
+    $fig2dev = "$fig2dev_path -L png -m 4";
     $fig2dev .= " | convert -transparent white - - " if ($png_transparent);
 } else {
     die "Error: unknown output type $output\n";
