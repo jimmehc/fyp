@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include "../constants.h"
 
-
 unsigned long long start;
 
 void foo(threaddata * td)
@@ -30,7 +29,6 @@ void foo(threaddata * td)
 		{
 			pthread_spin_lock(&td->lock->n);
 			#if DELAY
-			std::cout << "?";
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;
@@ -44,10 +42,6 @@ int main()
 {
 	pthread_t threads[NUM_THREADS];
 	
-	int * flag = (int *) malloc(sizeof(int)*2);
-	flag[0] = flag[1] = 0;
-	int turn;
-
 	Lock * lck = new Lock;
 
 	pthread_spin_init(&lck->n, PTHREAD_PROCESS_PRIVATE);

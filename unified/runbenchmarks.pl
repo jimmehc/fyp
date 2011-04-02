@@ -13,7 +13,7 @@ if(@ARGV >= 2)
 	}
 	else
 	{
-		@options = ("nnpnnn", "nnpnn");#, "nnpn", "nn", "nf","n");
+		@options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");
 	}
 	$delay = $ARGV[1];
 }
@@ -59,7 +59,7 @@ foreach $option (@options)
 			case "message_passing" { print "Queue of Messages"; }
 		}
 		print "\n";
-		`make DELAY=$delay -C$algorithm $option`;
+		print `make DELAY=$delay -C$algorithm $option`;
 	
 		$output = `./$algorithm/asymmetric`;
 		if($output =~ m/Tipping point/)
@@ -88,7 +88,7 @@ print $filename;
 
 open FILE, ">","results/$filename.gr" or die "WAT";
 
-print FILE "=cluster;Spinlock(baseline);Pthread Mutex;Asymmetric(Vasuvedan);Asymmetric Variation;One Function Pointer;Asynchronous FP;Message Passing;FP Spinlock;Function Pointer Queue;Message Passing Queue;\n=table\nyformat=%gx\n=norotate\nylabel=Speedup\nxlabel=Dominance Percentage\n\n"; 
+print FILE "=cluster;Spinlock(baseline);Pthread Mutex;Control;Asymmetric(Vasuvedan);Asymmetric Variation;One Function Pointer;Asynchronous FP;Message Passing;FP Spinlock;Function Pointer Queue;Message Passing Queue;\n=table\nyformat=%gx\n=norotate\nylabel=Speedup\nxlabel=Dominance Percentage\n\n"; 
 
 
 print FILE "#";
@@ -118,8 +118,8 @@ foreach $option (@options)
 	print FILE " ";
 	foreach $algorithm (@algorithms)
 	{
-		if($algorithm ne "control")
-		{
+#		if($algorithm ne "control")
+#		{
 			if($arr{$algorithm}{$option} != 0)
 			{
 				print FILE $arr{"spinlock"}{$option}/$arr{$algorithm}{$option};
@@ -129,7 +129,7 @@ foreach $option (@options)
 				print FILE 0;
 			}
 			print FILE " ";
-		}
+#		}
 	}
 	print FILE "\n";
 }
