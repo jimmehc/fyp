@@ -1,7 +1,7 @@
 #include <sys/types.h>
 #include "biasedlock.h"
 #include <iostream>
-#include "myqueue.h"
+#include "../../lib/myqueue.h"
 #include "spinlock.h"
 #include <sched.h>
 #include <stdio.h>

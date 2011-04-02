@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
 				if(k == "end") break;
 				for(int j = 0; j < 10; j++)
 					ss >> matrix[j][i];
-				if(++i == 10) break;
+				if(++i == 11) break;
 			}
 		}
 
@@ -41,7 +41,7 @@ int main(int argc, char * argv[])
 		for(int j = 0; j < 10; j++)
 		{
 			std::cout << labels[j] << " ";
-			for(int k = 0; k < 10; k++)
+			for(int k = 0; k < 11; k++)
 				std::cout << (double)matrix[j][0]/(double)matrix[j][k] << " ";
 			std::cout << std::endl;
 		}
