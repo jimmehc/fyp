@@ -58,8 +58,9 @@ void foo(threaddata * td)
 //		std::cout << "L1 Data Cache Hit Rate: " << (double)values[1]/((double)values[1] + (double)values[0]) << std::endl;
 //		#endif
 //		std::cout << *td->x << std::endl;
-//		std::cout << "dom thread done" << std::endl;
-//		std::cout << *td->x << std::endl;
+		td->lock->grant = true;
+		std::cout << "dom thread done" << std::endl;
+		std::cout << *td->x << std::endl;
 /*		while(1)
 		{
 			biased_unlock_owner();
@@ -69,7 +70,7 @@ void foo(threaddata * td)
 	{
 		qnode * I = new qnode;
 		timespec * t = new timespec;
-		t->tv_nsec = 1;
+		t->tv_nsec = 10000;
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock();
@@ -79,7 +80,7 @@ void foo(threaddata * td)
 			PAPI_start_counters(events, 2);
 			#endif
 
-			*(td->y) = (*td->y) + 1;
+			*(td->x) = (*td->x) + 1;
 
 			#ifdef CACHE_MISSES
 			long long values[2];
@@ -88,10 +89,10 @@ void foo(threaddata * td)
 			ch += values[1];			
 			#endif
 			biased_unlock();
-//			nanosleep(t,NULL);	
+			nanosleep(t,NULL);	
 		}
-//		std::cout << "time: " << get_time() - start << std::endl;
-//		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
+		std::cout << "time: " << get_time() - start << std::endl;
+		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 
@@ -139,5 +140,5 @@ int main()
 	std::cout << "L1 Data Cache Hits: " << ch << std::endl;
 	std::cout << "L1 Data Cache Hit Rate: " << (double)ch/(double)(cm+ch) << std::endl;
 	#endif
-	//std::cout << "x: " << *x << " y: " << *y << std::endl;
+	std::cout << "x: " << *x << " y: " << *y << std::endl;
 }

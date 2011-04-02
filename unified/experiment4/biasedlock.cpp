@@ -55,7 +55,7 @@ void foo(threaddata * td)
 
 	//		biased_unlock_owner(td);
 		}
-		std::cerr << "dom thread done" << std::endl;
+		std::cout << "dom thread done" << std::endl;
 //		std::cout << *td->x << std::endl;
 //		while(1) if(td->lock->func != NULL) td->lock->func(td->x, td->lock);
 	}
@@ -120,7 +120,7 @@ int main()
 
 	for(int i = 1; i < NUM_THREADS; i++)
 		if(!j[i]->done)
-			std::cerr << "Tipping point hit, non dom threads not complete, x: " << *x << std::endl;
+			std::cout << "Tipping point hit, non dom threads not complete, x: " << *x << std::endl;
 
 	unsigned long long end = get_time();
 

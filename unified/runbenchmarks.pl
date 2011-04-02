@@ -13,7 +13,7 @@ if(@ARGV >= 2)
 	}
 	else
 	{
-		@options = ("nnpnnn", "nnpnn");#, "nnpn", "nn", "nf","n");
+		@options = ("nnpnnn", "nnpnn", "nnpn", "nn", "nf","n");
 	}
 	$delay = $ARGV[1];
 }

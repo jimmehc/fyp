@@ -55,8 +55,8 @@ void foo(threaddata * td)
 				while(td->lock->q->popElement(&fp)) fp(td->x, td->lock);
 	//		biased_unlock_owner(td);
 		}
-//		std::cout << "dom thread done" << std::endl;
-//		std::cout << *td->x << std::endl;
+		std::cout << "dom thread done" << std::endl;
+		std::cout << *td->x << std::endl;
 	}
 	else
 	{

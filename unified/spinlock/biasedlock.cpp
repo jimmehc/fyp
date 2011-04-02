@@ -6,7 +6,7 @@
 #include <sched.h>
 #include <stdio.h>
 #include "../constants.h"
-
+#include <cstdlib>
 
 unsigned long long start;
 
@@ -30,7 +30,6 @@ void foo(threaddata * td)
 		{
 			pthread_spin_lock(&td->lock->n);
 			#if DELAY
-			std::cout << "?";
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 			*td->x = *td->x + 1;
