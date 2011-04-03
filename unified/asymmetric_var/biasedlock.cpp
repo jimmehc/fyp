@@ -10,23 +10,23 @@
 
 unsigned long long start;
 
-#define biased_lock_owner() while(td->lock->grant){asm volatile ("pause");}
+#define biased_lock_owner() while(td->lock->grant){;}
 #define biased_unlock_owner()	\
 	if(td->lock->request) \
 	{	\
 		td->lock->request = false; \
-		asm volatile ("mfence");\
+		asm volatile ("sync");\
 		td->lock->grant = true;\
-		while(td->lock->grant){asm volatile ("pause");} \
+		while(td->lock->grant){;} \
 	}
 
 
 #define biased_lock() \
 	pthread_spin_lock(&(td->lock->n)); \
 	td->lock->request = true; \
-	while(!td->lock->grant){ asm volatile ("pause"); }
+	while(!td->lock->grant){ ; }
 #define biased_unlock() \
-	asm volatile ("mfence"); \
+	asm volatile ("sync"); \
 	td->lock->grant = false; \
 	pthread_spin_unlock(&(td->lock->n));
 

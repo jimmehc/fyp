@@ -18,7 +18,7 @@ inline void biased_unlock_owner(Lock * l, int * i)
 	if(l->request)
 	{
 		l->request = false;
-		asm volatile ("mfence");
+		asm volatile ("sync");
 		l->grant = true;
 	}
 }
@@ -32,7 +32,7 @@ inline void biased_lock(Lock * l, int * i)
 
 void biased_unlock(Lock * l, int * i)
 {
-	asm volatile ("mfence");
+	asm volatile ("sync");
 	l->grant = false;
 	pthread_spin_unlock(&(l->n));
 }
@@ -46,7 +46,7 @@ void foo(threaddata * td)
 		{
 			//biased_lock_owner(td->lock, td->threadid);
 			td->lock->flag[*(td->threadid)] = true;
-			asm volatile ("mfence");
+			asm volatile ("sync");
 			while (td->lock->flag[!*(td->threadid)] == true)
 			{
 				if(td->lock->turn == *(td->threadid))
@@ -54,10 +54,10 @@ void foo(threaddata * td)
 					td->lock->flag[*(td->threadid)] = false;
 					while(td->lock->turn != *(td->threadid));
 					td->lock->flag[*(td->threadid)] = true;
-					asm volatile ("mfence");
+					asm volatile ("sync");
 				}
 			}
-			asm volatile ("mfence");
+			asm volatile ("sync");
 					
 			while (td->lock->grant);
 
@@ -67,10 +67,10 @@ void foo(threaddata * td)
 			if(td->lock->request)
 			{
 				td->lock->request = false;
-				asm volatile ("mfence");
+				asm volatile ("sync");
 				td->lock->grant = true;
 			}
-			asm volatile ("mfence");
+			asm volatile ("sync");
 			td->lock->turn == !*(td->threadid);
 			td->lock->flag[*td->threadid] = false;
 		}
@@ -79,7 +79,7 @@ void foo(threaddata * td)
 			if(td->lock->request)
 			{	
 	        		td->lock->request = false;
-			        asm volatile ("mfence");
+			        asm volatile ("sync");
 				td->lock->grant = true;
 			}*/
 	}

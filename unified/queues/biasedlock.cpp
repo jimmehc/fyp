@@ -25,7 +25,7 @@ inline void incy (int * const y, Lock * l)
 	#endif	
 	(*y)++;
 	l->done = 1;
-	asm volatile("mfence");
+	asm volatile("sync");
 }
 
 inline void biased_lock(Lock * l, int * i)
@@ -65,10 +65,10 @@ void foo(threaddata * td)
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock(td->lock, td->threadid);
-			//asm volatile ("mfence");i
+			//asm volatile ("sync");i
 			fp = &incy;
 			while(!td->lock->q->pushElement(&fp));
-			//asm volatile ("mfence");
+			//asm volatile ("sync");
 			biased_unlock(td->lock, td->threadid);
 //			nanosleep(t,NULL);
 		}
