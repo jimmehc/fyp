@@ -19,7 +19,7 @@ long long cm=0, ch=0;
 	if(td->lock->request) \
 	{	\
 		td->lock->request = false; \
-		asm volatile ("mfence");\
+		asm volatile ("sync");\
 		td->lock->grant = true;\
 	}
 
@@ -29,7 +29,7 @@ long long cm=0, ch=0;
 	td->lock->request = true; \
 	while(!td->lock->grant){ asm volatile ("pause"); }
 #define biased_unlock() \
-	asm volatile ("mfence"); \
+	asm volatile ("sync"); \
 	td->lock->grant = false; \
 	spinlock::unlockN(&(td->lock->n));
 

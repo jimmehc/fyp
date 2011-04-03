@@ -32,7 +32,7 @@ inline void incy (int * const y, Lock * l)
 {
 	(*y)++;
 	l->done = 1;
-	asm volatile("mfence");
+	asm volatile("sync");
 }
 
 inline void biased_lock(Lock * l, int * i)
@@ -62,15 +62,15 @@ void foo(threaddata * td)
 					{
 						case 1:
 							(*td->x) = (*td->x) + (*td->k1);
-							asm volatile("mfence");
+							asm volatile("sync");
 							break;
 						case 2:
 							(*td->x) = (*td->x) + (*td->k2);
-							asm volatile("mfence");
+							asm volatile("sync");
 							break;
 						case 3:
 							(*td->x) = (*td->x) + (*td->k3);
-							asm volatile("mfence");
+							asm volatile("sync");
 							break;
 					}
 				}
@@ -90,9 +90,9 @@ void foo(threaddata * td)
 		for(int i = 0; i < 3333333; i++)
 		{
 			biased_lock(td->lock, td->threadid);
-			//asm volatile ("mfence");i
+			//asm volatile ("sync");i
 			while(!td->lock->q->pushElement(td->threadid));
-		//	asm volatile ("mfence");
+		//	asm volatile ("sync");
 			biased_unlock(td->lock, td->threadid);
 		//	nanosleep(t,NULL);
 		}

@@ -29,7 +29,7 @@ inline void biased_unlock_owner(Lock * l, int * i)
 	if(l->request)
 	{
 		l->request = false;
-		asm volatile ("mfence");
+		asm volatile ("sync");
 		l->grant = true;
 	}
 }
@@ -43,7 +43,7 @@ inline void biased_lock(qnode * I, qnode ** L, Lock * l)
 
 void biased_unlock(qnode * I, qnode ** L, Lock * l)
 {
-	asm volatile ("mfence");
+	asm volatile ("sync");
 	l->grant = false;
 	release_lock(L,I);
 }
@@ -67,7 +67,7 @@ void foo(threaddata * td)
 			if(td->lock->request)
 			{
 				td->lock->request = false;
-				asm volatile ("mfence");
+				asm volatile ("sync");
 				td->lock->grant = true;
 			}
 		}

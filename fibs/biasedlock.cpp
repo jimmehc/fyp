@@ -10,7 +10,7 @@
 inline void incy (int * y, Lock * l)
 {
 	(*y)++;
-		asm volatile("mfence");
+		asm volatile("sync");
 		l->done = 1;
 		l->func = NULL;
 }

@@ -38,7 +38,7 @@ inline void incy (int * y, Lock * l)
 	(*y) = (*y) + 1;
 	l->func = NULL;
 	l->done = 1;
-	asm volatile("mfence");
+	asm volatile("sync");
 	#ifdef CACHE_MISSES
 	long long values[2];
 	PAPI_read_counters(values, 2);
@@ -95,9 +95,9 @@ void foo(threaddata * td)
 		{
 			biased_lock(td->lock, td->threadid);
 			td->lock->done = 0;
-			//asm volatile ("mfence");
+			//asm volatile ("sync");
 			td->lock->func = &incy;
-			asm volatile ("mfence");
+			asm volatile ("sync");
 			while((!td->lock->done)){ asm volatile ("pause");}
 			biased_unlock(td->lock, td->threadid);
 //			nanosleep(t,NULL);

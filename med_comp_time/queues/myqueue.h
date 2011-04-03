@@ -25,7 +25,7 @@ bool myqueue<T>::popElement(T * Element)
         int nextElement = (m_Read + 1) % Size;
         *Element = m_Data[m_Read];
         m_Read = nextElement;
-	asm volatile ("mfence");
+	asm volatile ("sync");
         return true;
 }
 
@@ -37,7 +37,7 @@ bool myqueue<T>::pushElement(T * Element)
         {
                 m_Data[m_Write] = *Element;
                 m_Write = nextElement;
-		asm volatile ("mfence");
+		asm volatile ("sync");
                 return true;
         }
         else

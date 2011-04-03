@@ -24,7 +24,7 @@ rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
 	if(td->lock->request) \
 	{	\
 		td->lock->request = false; \
-		asm volatile ("mfence");\
+		asm volatile ("sync");\
 		td->lock->grant = true;\
 		while(td->lock->grant){asm volatile ("pause");} \
 	}
@@ -35,7 +35,7 @@ rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
 	td->lock->request = true; \
 	while(!td->lock->grant){ asm volatile ("pause"); }
 #define biased_unlock() \
-	asm volatile ("mfence"); \
+	asm volatile ("sync"); \
 	td->lock->grant = false; \
 	spinlock::unlockN(&(td->lock->n));
 

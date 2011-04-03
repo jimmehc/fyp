@@ -8,13 +8,13 @@ void peterson::lock2 (int threadid, int * flag, int * turn)
 
 	*turn = !threadid;
 
-	asm volatile ("mfence");
+	asm volatile ("sync");
 
 	while(flag[!threadid] == 1 && *turn == !threadid);
 }
 
 void peterson::unlock2 (int threadid, int * flag)
 {
-	asm volatile ("mfence");
+	asm volatile ("sync");
 	flag[threadid] = 0;
 }

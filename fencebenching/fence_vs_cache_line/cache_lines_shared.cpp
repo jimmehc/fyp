@@ -13,7 +13,7 @@ void writex(threaddata * td)
 	for(int i = 0; i < 1000000000; i++)
 	{
 		td->x = i;
-		asm volatile ("mfence");
+		asm volatile ("sync");
 	}
 }
 
@@ -22,7 +22,7 @@ void writey(threaddata * td)
 	for(int i = 0; i < 1000000000; i++)
 	{
 		td->y = i;
-		asm volatile ("mfence");
+		asm volatile ("sync");
 	}
 }
 
@@ -31,7 +31,7 @@ void writez(threaddata * td)
 	for(int i = 0; i < 1000000000; i++)
 	{
 		td->z = i;
-		asm volatile ("mfence");
+		asm volatile ("sync");
 	}
 }
 
@@ -40,7 +40,7 @@ void writew(threaddata * td)
 	for(int i = 0; i < 1000000000; i++)
 	{
 		td->w = i;
-		asm volatile ("mfence");
+		asm volatile ("sync");
 	}
 }
 

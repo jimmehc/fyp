@@ -32,7 +32,7 @@ inline void incy (int * y, Lock * l)
 	(*y) = (*y) + (*l->k);
 	l->func = NULL;
 	l->done = 1;
-	asm volatile("mfence");
+	asm volatile("sync");
 }
 
 inline void biased_lock(Lock * l, int * i)
@@ -70,10 +70,10 @@ void foo(threaddata * td)
 		{
 			biased_lock(td->lock, td->threadid);
 			td->lock->done = 0;
-			//asm volatile ("mfence");
+			//asm volatile ("sync");
 			td->lock->k = td->k;
 			td->lock->func = &incy;
-			asm volatile ("mfence");
+			asm volatile ("sync");
 			while(!(td->lock->done));
 			biased_unlock(td->lock, td->threadid);
 		//	nanosleep(t,NULL);
