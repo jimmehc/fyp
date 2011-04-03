@@ -81,7 +81,7 @@ void foo(threaddata * td)
 	{
 		timespec * t = new timespec;
 		t->tv_nsec = 1;
-		for(int i = 0; i < NON_DOM_ACCESSES; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES/NUM_THREADS; i++)
 		{
 			biased_lock(td->lock, td->threadid);
 			//asm volatile ("sync");i

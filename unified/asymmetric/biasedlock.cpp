@@ -59,7 +59,7 @@ void foo(threaddata * td)
 		qnode * I = new qnode;
 		timespec * t = new timespec;
 		t->tv_nsec = 1;
-		for(int i = 0; i < NON_DOM_ACCESSES; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES/NUM_THREADS; i++)
 		{
 			biased_lock();
 

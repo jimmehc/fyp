@@ -26,7 +26,7 @@ void foo(threaddata * td)
 	}
 	else
 	{
-		for(int i = 0; i < NON_DOM_ACCESSES; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES/NUM_THREADS; i++)
 		{
 			pthread_mutex_lock(td->m);
 			#if DELAY
