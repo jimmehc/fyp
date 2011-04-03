@@ -14,6 +14,7 @@ struct _threaddata
 	int * x;
 	int * y;
 	qnode ** L;
+	bool done;
 };
 
 #endif
