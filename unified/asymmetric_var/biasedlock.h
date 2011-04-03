@@ -26,6 +26,7 @@ typedef struct
 	Lock *lock;
 	int * x;
 	int * y;
+	bool done;
 } threaddata;
 
 void biased_lock(Lock * l, int * i);
