@@ -5,25 +5,16 @@
 #include "../../lib/timing.h"
 #include <sched.h>
 #include <stdio.h>
+#include "../constants.h"
 
 unsigned long long start;
-
-/* timing code */
-unsigned long long get_time()
-{
- unsigned long lo,hi;
- __asm__ __volatile__("xorl %%eax,%%eax\n\
-cpuid\n\
-rdtsc" : "=a" (lo), "=d" (hi) : : "ebx", "ecx" );
- return ((unsigned long long)lo) + (unsigned long long)(hi<<32ULL);
-}
 
 void foo(threaddata * td)
 {
 	qnode * I = new qnode;
 	if(*td->threadid == 0)
 	{
-		for(int i = 0; i < 1000000000; i++)
+		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 			acquire_lock(td->L, I);
 			#if DELAY
@@ -35,7 +26,7 @@ void foo(threaddata * td)
 	}
 	else
 	{
-		for(int i = 0; i < 100000; i++)
+		for(int i = 0; i < NON_DOM_ACCESSES/NUM_THREADS; i++)
 		{
 			acquire_lock(td->L, I);
 			#if DELAY
@@ -48,7 +39,6 @@ void foo(threaddata * td)
 }	
 
 
-#define NUM_THREADS 128	
 int main()
 {
 	pthread_t threads[NUM_THREADS];

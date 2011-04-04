@@ -4,7 +4,7 @@
 #include <sched.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "mcs.h"
+#include "../../lib/mcs.h"
 
 typedef struct _threaddata threaddata;
 

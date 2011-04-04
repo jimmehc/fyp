@@ -1,38 +1,38 @@
 nnpnnn:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnnpnnn control.cpp -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY}  
 
 nnpnn:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNNPNN -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnnpnn control.cpp -lpthread -Wall -Wextra -DNNPNN -DDELAY=${DELAY}  
 
 nnpn:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNNPN -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnnpn control.cpp -lpthread -Wall -Wextra -DNNPN -DDELAY=${DELAY}  
 
 nn:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNN  -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnn control.cpp -lpthread -Wall -Wextra -DNN  -DDELAY=${DELAY}  
 
 nf:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNF  -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnf control.cpp -lpthread -Wall -Wextra -DNF  -DDELAY=${DELAY} 
 
 n:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DN -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricn control.cpp -lpthread -Wall -Wextra -DN -DDELAY=${DELAY} 
 
 ef:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DEF -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricef control.cpp -lpthread -Wall -Wextra -DEF -DDELAY=${DELAY}
 
 e:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DE -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetrice control.cpp -lpthread -Wall -Wextra -DE -DDELAY=${DELAY}
 
 sf:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DSF -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricsf control.cpp -lpthread -Wall -Wextra -DSF -DDELAY=${DELAY}
 
 s:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DS -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetrics control.cpp -lpthread -Wall -Wextra -DS -DDELAY=${DELAY}
 
 si:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DSI -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricsi control.cpp -lpthread -Wall -Wextra -DSI -DDELAY=${DELAY}
 
 f:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DF -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricf control.cpp -lpthread -Wall -Wextra -DF -DDELAY=${DELAY} 
 
 debug:
 	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DDEBUG -DNNPNNN

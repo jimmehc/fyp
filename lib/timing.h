@@ -8,9 +8,9 @@ unsigned long long get_time()
 	timeval t;
 
 	gettimeofday(&t, NULL);
-    res = (t.tv_sec - t.tv_sec);
+    res = t.tv_sec;
 	res *= (1000 * 1000);
-	res += (t.tv_usec - t.tv_usec);
+	res += t.tv_usec;
 
 	return res;
 }

@@ -1,37 +1,38 @@
 nnpnnn:
-	g++ -o asymmetric biasedlock.cpp "../../cpucycles-20060326/cpucycles.o" -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY} 
+	g++ -o asymmetricnnpnnn biasedlock.cpp -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY}  
+
 nnpnn:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPNN -DDELAY=${DELAY} "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnnpnn biasedlock.cpp -lpthread -Wall -Wextra -DNNPNN -DDELAY=${DELAY}  
 
 nnpn:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPN -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnnpn biasedlock.cpp -lpthread -Wall -Wextra -DNNPN -DDELAY=${DELAY}  
 
 nn:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNN  -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnn biasedlock.cpp -lpthread -Wall -Wextra -DNN  -DDELAY=${DELAY}  
 
 nf:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNF  -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricnf biasedlock.cpp -lpthread -Wall -Wextra -DNF  -DDELAY=${DELAY} 
 
 n:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DN -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricn biasedlock.cpp -lpthread -Wall -Wextra -DN -DDELAY=${DELAY} 
 
 ef:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DEF -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricef biasedlock.cpp -lpthread -Wall -Wextra -DEF -DDELAY=${DELAY}
 
 e:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DE -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetrice biasedlock.cpp -lpthread -Wall -Wextra -DE -DDELAY=${DELAY}
 
 sf:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DSF -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricsf biasedlock.cpp -lpthread -Wall -Wextra -DSF -DDELAY=${DELAY}
 
 s:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DS -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetrics biasedlock.cpp -lpthread -Wall -Wextra -DS -DDELAY=${DELAY}
 
 si:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DSI -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricsi biasedlock.cpp -lpthread -Wall -Wextra -DSI -DDELAY=${DELAY}
 
 f:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DF -DDELAY=${DELAY}  "../../cpucycles-20060326/cpucycles.o"
+	g++ -o asymmetricf biasedlock.cpp -lpthread -Wall -Wextra -DF -DDELAY=${DELAY} 
 
 debug:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DDEBUG -DNNPNNN
