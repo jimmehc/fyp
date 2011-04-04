@@ -1,8 +1,16 @@
-#include "../cpucycles-20060326/cpucycles.h"
-
+#include <sys/time.h>
 
 /* timing code */
 unsigned long long get_time()
 {
-	return cpucycles_powerpclinux();
+	unsigned long long res;
+
+	timeval t;
+
+	gettimeofday(&t, NULL);
+    res = (t.tv_sec - t.tv_sec);
+	res *= (1000 * 1000);
+	res += (t.tv_usec - t.tv_usec);
+
+	return res;
 }
