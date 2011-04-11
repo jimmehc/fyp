@@ -12,6 +12,7 @@ typedef struct
 	int *threadid;
 	int * x;
 	int * y;
+	bool done;
 } threaddata;
 
 #endif

@@ -24,6 +24,7 @@ class threaddata
 	int * x;
 	int * y;
 	Lock *lock;
+	bool done;
 };
 
 #endif

@@ -15,6 +15,7 @@ typedef struct
 	Lock *lock;
 	int * x;
 	int * y;
+	bool done;
 } threaddata;
 
 #endif

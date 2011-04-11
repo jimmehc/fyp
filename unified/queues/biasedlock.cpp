@@ -72,13 +72,14 @@ void foo(threaddata * td)
 			biased_unlock(td->lock, td->threadid);
 //			nanosleep(t,NULL);
 		}
+		td->done = true;
 //		std::cout << "time: " << get_time() - start << std::endl;
 //		std::cout << "thread " << *(td->threadid) << " done" << std::endl;
 	}
 }	
 
 
-#define NUM_THREADS 4	
+ 	
 int main()
 {
 	pthread_t threads[NUM_THREADS];
@@ -102,11 +103,15 @@ int main()
 		j[i]->y = y;
 		j[i]->threadid = u;
 		j[i]->lock = lck;
+		j[i]->done = false;
 
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) j[i] );
 	}	
-	for(int i = 0; i < NUM_THREADS; i++)
-		pthread_join(threads[i], NULL);
+	pthread_join(threads[0], NULL);	//wait for dom thread
+
+	for(int i = 1; i < NUM_THREADS; i++)
+		if(!j[i]->done)
+			std::cout << "Tipping point hit, non dom threads not complete, x: " << *x << std::endl;
 
 	unsigned long long end = get_time();
 

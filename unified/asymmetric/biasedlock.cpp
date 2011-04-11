@@ -78,7 +78,7 @@ void foo(threaddata * td)
 	}
 }	
 
-#define NUM_THREADS 4			
+ 			
 int main()
 {
 	pthread_t threads[NUM_THREADS];

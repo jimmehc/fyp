@@ -1,3 +1,5 @@
+#define NUM_THREADS 4
+
 #define DOM_ACCESSES 1000000000
 
 #if NNPNNN

@@ -20,6 +20,7 @@ typedef struct
 	int * y;
 	Lock * lock;
 	qnode ** L;
+	bool done;
 } threaddata;
 
 #endif
