@@ -8,7 +8,9 @@ volatile unsigned long long start;
 
 void foo(threaddata * td)
 {
+	int x = 0;
 	volatile Lock * lock = td->lock;
+	startoffoo();
 	if(*(td->threadid) == 0)
 	{
 		for(int i = 0; i < DOM_ACCESSES; i++)
@@ -19,18 +21,15 @@ void foo(threaddata * td)
 			for(int j = 0; j < DELAY; j++) ;
 			#endif	
 	
-			*(td->x) = (*td->x) + 1;
+			x = x + 1;
 		
 			biased_unlock_owner(lock);		
 	
 		}
-//		std::cout << *td->x << std::endl;
-//		std::cout << "dom thread done" << std::endl;
-//		std::cout << *td->x << std::endl;
-#ifdef LOOP
+		std::cout << "x == " << x << std::endl;
+#ifndef AITP
 		while(!td->done)
 		{
-			asm volatile ("pause");
 			biased_unlock_owner(lock);
 		}
 #endif
@@ -58,6 +57,7 @@ void foo(threaddata * td)
 	}
 }	
 
+ 			
 int main()
 {
 	pthread_t threads[NUM_THREADS];
@@ -67,20 +67,25 @@ int main()
 	lock_init(lck);
 
 	threaddata j[NUM_THREADS];
-	int * x = new int(0);
-
+	
 	start = get_time();
 
 	for(int i = 0; i < NUM_THREADS; i++)
 	{
-		j[i].x = x;
 		j[i].lock = lck;
 		j[i].threadid = new int(i);
 		j[i].done = false;
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) &j[i] );
-	}	
+	}
 
-#ifdef LOOP		
+#ifdef AITP		//Abandon if Tipping Point
+	pthread_join(threads[0], NULL);	//wait for dom thread
+
+	for(int i = 1; i < NUM_THREADS; i++)
+		if(!j[i].done)
+			std::cout << "Tipping point hit, non dom threads not complete, x: " << *x << std::endl;
+
+#else
 	for(int i = 1; i < NUM_THREADS; i++)
 		pthread_join(threads[i], NULL);
 
@@ -88,17 +93,9 @@ int main()
 	asm volatile ("mfence");
 	//std::cout << "done should now be true " << &j[0].done << std::endl;
 	pthread_join(threads[0], NULL);
-#else
-	pthread_join(threads[0], NULL);	//wait for dom thread
-
-	for(int i = 1; i < NUM_THREADS; i++)
-		if(!j[i].done)
-			std::cout << "Tipping point hit, non dom threads not complete, x: " << *x << std::endl;
 #endif
 
 	volatile unsigned long long end = get_time();
 
 	std::cout << "time: " << end-start << std::endl;
-
-	std::cout << "x: " << *x << std::endl;
 }

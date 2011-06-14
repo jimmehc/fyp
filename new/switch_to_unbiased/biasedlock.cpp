@@ -25,15 +25,10 @@ void foo(threaddata * td)
 	
 		}
 //		std::cout << *td->x << std::endl;
-//		std::cout << "dom thread done" << std::endl;
+		std::cout << "dom thread done" << std::endl;
 //		std::cout << *td->x << std::endl;
-#ifndef AITP
-		while(!td->done)
-		{
-			asm volatile ("pause");
-			biased_unlock_owner(lock);
-		}
-#endif
+		*td->biased_mode = false;
+		asm volatile ("mfence");
 	}
 	else
 	{
@@ -51,6 +46,7 @@ void foo(threaddata * td)
 
 			biased_unlock(lock);
 //			nanosleep(t,NULL);	
+//			for(volatile int j = 0; j < 20; j++);
 		}
 		td->done = true;
 //		std::cout << "time: " << get_time() - start << std::endl;
@@ -71,10 +67,13 @@ int main()
 
 	start = get_time();
 
+	bool * biased_mode = new bool(true);
+
 	for(int i = 0; i < NUM_THREADS; i++)
 	{
 		j[i].x = x;
 		j[i].lock = lck;
+		j[i].biased_mode = biased_mode;
 		j[i].threadid = new int(i);
 		j[i].done = false;
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) &j[i] );

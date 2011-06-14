@@ -6,9 +6,8 @@ use Getopt::Std;
 #filename,delay,long,execute,process,rawout,graphout
 &getopts("f:d:lxprg");
 
-#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR", "FPRS", "MPRS");
-my @all_algorithms = ("SPL", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR", "FPRS", "MPRS");
-my @algorithms_to_run = ("FPR", "AFPR", "MPR", "AMPR", "ISPLR", "ISPLMPR", "QFPR", "MPQR");
+my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR", "FPS", "MPS", "FPRS", "MPRS");
+my @algorithms_to_run = ("FPRS", "MPRS");
 my @options;
 my %arr;
 
@@ -190,8 +189,7 @@ sub output_graph_file
 			case "ISPLMPR" { print FILE "Integrated Message Passing Spinlock (Register);"; }
 			case "QFPR" { print FILE "Queue of Function Pointers (Register);"; }
 			case "MPQR" { print FILE "Queue of Messages (Register);"; }
-			case "FPRS" { print FILE "Function Pointer Passing (Switch2Unbiased);"; }
-			case "MPRS" { print FILE "Message Passing (Switch2Unbiased)"; }
+			case "FPS" { print FILE "Function Pointer Passing (Switch2Unbiased)"; }
 		}
 	}
 

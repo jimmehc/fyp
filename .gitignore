@@ -1,3 +1,6 @@
 packet_proc/*
 *graphs/*
 *asymmetric
+*.gr
+*.raw
+
