@@ -7,21 +7,19 @@
 
 
 
-typedef struct lll {
+struct Lock {
 	//Lock2 t;
 	pthread_spinlock_t n; //LockN
 	int done;
-	void (*func)(int * y, struct lll * l);
-} Lock;
+	void (*func)(int * y, volatile Lock * l);
+};
 
 class threaddata
 {
 	public:
 	int *threadid;
-	int * x;
-	int * y;
-	Lock *lock;
-	threaddata():x(NULL), y(NULL){}
+	volatile Lock *lock;
+	threaddata(){}
 	bool done;
 };
 

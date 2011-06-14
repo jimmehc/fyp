@@ -1,5 +1,5 @@
 nnpnnn:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY}
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY} -O3
 
 nnpnn:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPNN -DDELAY=${DELAY}
@@ -8,7 +8,7 @@ nnpn:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNNPN -DDELAY=${DELAY}
 
 nn:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNN  -DDELAY=${DELAY}
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNN  -DDELAY=${DELAY} -O3
 
 nf:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -DNF  -DDELAY=${DELAY}
