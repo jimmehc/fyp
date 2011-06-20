@@ -1,0 +1,14 @@
+=cluster;Spinlock(baseline);Asymmetric(Vasuvedan);Asymmetric Variation;One Function Pointer;Asynchronous FP;Message Passing;Function Pointer Queue;Message Passing Queue;One Function Pointer;Asynchronous FP;Message Passing;Asynchronous Message Passing;Function Pointer Queue;Message Passing Queue
+=table
+yformat=%gx
+=norotate
+ylabel=Speedup
+xlabel=Dominance Percentage
+
+#
+99.999 
+99.99 
+99.9 
+99 
+95 
+90 

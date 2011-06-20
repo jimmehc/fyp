@@ -7,7 +7,7 @@ use Getopt::Std;
 &getopts("f:d:lxprg");
 
 #my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR", "FPRS", "MPRS");
-my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR", "VASVARRS", "FPRS", "MPRS");
+my @all_algorithms = ("SPL", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR", "FPRS", "MPRS");
 my @algorithms_to_run = ("FPR", "AFPR", "MPR", "AMPR", "ISPLR", "ISPLMPR", "QFPR", "MPQR");
 my @options;
 my %arr;
@@ -19,8 +19,8 @@ if($opt_l)
 }
 else
 {
-	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N");
-	#@options = ("NF","N");
+	#@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N");
+	@options = ("NF","N");
 }
 
 if($opt_d)
@@ -190,7 +190,6 @@ sub output_graph_file
 			case "ISPLMPR" { print FILE "Integrated Message Passing Spinlock (Register);"; }
 			case "QFPR" { print FILE "Queue of Function Pointers (Register);"; }
 			case "MPQR" { print FILE "Queue of Messages (Register);"; }
-			case "VASVARRS" { print FILE "Asymmetric Variation (Switch2Unbiased);"; }
 			case "FPRS" { print FILE "Function Pointer Passing (Switch2Unbiased);"; }
 			case "MPRS" { print FILE "Message Passing (Switch2Unbiased)"; }
 		}

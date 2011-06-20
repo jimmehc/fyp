@@ -7,7 +7,7 @@ use Getopt::Std;
 &getopts("f:d:lxprg");
 
 my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR", "FPS", "MPS", "FPRS", "MPRS");
-my @algorithms_to_run = ("VASVARRS", "FPRS", "MPRS");
+my @algorithms_to_run = ("FPRS", "MPRS");
 my @options;
 my %arr;
 
@@ -18,8 +18,8 @@ if($opt_l)
 }
 else
 {
-	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N");
-	#@options = ("NF","N");
+	#@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N");
+	@options = ("NF","N");
 }
 
 if($opt_d)

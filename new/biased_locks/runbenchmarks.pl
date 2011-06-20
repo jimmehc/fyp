@@ -115,7 +115,7 @@ sub run_tests
 			
 			}
 			print "\n";
-			print `make DELAY=$delay ALG=$algorithm DOM=$option TP=LOOP`;
+			print `make DELAY=$delay ALG=$algorithm DOM=$option`;
 		
 			$output = `./asymmetric`;
 			if($output =~ m/Tipping point/)

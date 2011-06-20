@@ -12,7 +12,7 @@ struct threaddata
 
 	//shared
 	volatile Lock *lock;
-	volatile int * x;
+	int * x;
 	volatile bool done;
 };
 #ifdef SPL 
@@ -134,7 +134,7 @@ struct Lock {
 struct Lock {
 	pthread_spinlock_t n;
 	int done;
-	void (*func)(volatile int * y, volatile Lock * l);
+	void (*func)(int * y, volatile Lock * l);
 };
 
 #define lock_init(lock) \
@@ -164,7 +164,7 @@ struct Lock {
 #define non_dom_crit_sec() \
 	td->lock->func = &incy;						/*XXX: REVISIT*/
 
-inline void incy (volatile int * y, volatile Lock * l)		/* GENERALIZE? */
+inline void incy (int * y, volatile Lock * l)		/* GENERALIZE? */
 {
 	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
@@ -214,7 +214,7 @@ struct Lock {
 struct Lock {
 	pthread_spinlock_t n;
 	int done;
-	void (*func)(volatile int * y, volatile Lock * l);
+	void (*func)(int * y, volatile Lock * l);
 };
 
 #define lock_init(lock) \
@@ -243,7 +243,7 @@ struct Lock {
 #define non_dom_crit_sec() \
 	td->lock->func = &incy;						/*XXX: REVISIT*/
 
-inline void incy (volatile int * y, volatile Lock * l)		/* GENERALIZE? */
+inline void incy (int * y, volatile Lock * l)		/* GENERALIZE? */
 {
 	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
@@ -256,7 +256,7 @@ inline void incy (volatile int * y, volatile Lock * l)		/* GENERALIZE? */
 #ifdef AFP
 struct Lock {
 	pthread_spinlock_t n;
-	void (*func)(volatile int * y, volatile Lock * l);
+	void (*func)(int * y, volatile Lock * l);
 };
 
 #define lock_init(lock) \
@@ -282,7 +282,7 @@ struct Lock {
 #define non_dom_crit_sec() \
 	td->lock->func = &incy;
 
-inline void incy (volatile int * y, volatile Lock * l)
+inline void incy (int * y, volatile Lock * l)
 {
 	l->func = NULL;
 	asm volatile ("mfence");
@@ -371,12 +371,12 @@ struct Lock {
 #endif
 
 #ifdef ISPL
-typedef void (*fp)(volatile int*, volatile Lock*);
+typedef void (*fp)(int*, volatile Lock*);
 
 #define CAS __sync_bool_compare_and_swap
 
 struct Lock {
-	void (*func)(volatile int * y, volatile Lock * l);
+	void (*func)(int * y, volatile Lock * l);
 };
 
 inline void pushWork (volatile fp * lck, fp func)
@@ -384,7 +384,7 @@ inline void pushWork (volatile fp * lck, fp func)
 	int success = 0;
 	do
 	{
-		while (*lck != NULL) {asm volatile ("pause");}
+		while (*lck != NULL) ;
 		success = CAS(lck, NULL, func);
 	}while(!success);
 }
@@ -408,7 +408,7 @@ inline void pushWork (volatile fp * lck, fp func)
 
 #define non_dom_crit_sec() 
 
-inline void incy (volatile int * y, volatile Lock * l)
+inline void incy (int * y, volatile Lock * l)
 {
 	l->func = NULL;
 	asm volatile ("mfence");
@@ -427,13 +427,13 @@ struct Lock {
 	int token;
 };
 
-inline void pushWork (volatile volatile int * lck, int token)
+inline void pushWork (volatile int * lck, int token)
 {
 	int success = 0;
 	do
 	{
 		while (*lck != 0) ;
-		success = CAS(lck, 0, token){ asm volatile ("pause"); }
+		success = CAS(lck, 0, token);
 	}while(!success);
 }
 
@@ -469,17 +469,17 @@ inline void pushWork (volatile volatile int * lck, int token)
 
 #include "../../lib/myqueue.h"
 
-typedef void (*fp)(volatile int*, volatile Lock*);
+typedef void (*fp)(int*, volatile Lock*);
 
 struct Lock {
 	pthread_spinlock_t n;
 	myqueue<fp> * q;
 };
 
-void (*func)(volatile int * y, volatile Lock * l);
+void (*func)(int * y, volatile Lock * l);
 
 #define lock_init(lock) \
-	lck->q = new myqueue<void (*)(volatile int*, volatile Lock*)>;\
+	lck->q = new myqueue<void (*)(int*, volatile Lock*)>;\
 	pthread_spin_init(&lock->n, PTHREAD_PROCESS_PRIVATE);
 
 #define biased_lock_owner(lock)  
@@ -496,9 +496,9 @@ void (*func)(volatile int * y, volatile Lock * l);
 
 #define non_dom_crit_sec() \
 	func = &incy;	\
-	while(!td->lock->q->pushElement(&func)) {asm volatile ("pause");}
+	while(!td->lock->q->pushElement(&func));
 
-inline void incy (volatile int * y, volatile Lock * l)
+inline void incy (int * y, volatile Lock * l)
 {
 	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
@@ -543,7 +543,7 @@ int el;
 
 #define non_dom_crit_sec() \
 	el = 1;	\
-	while(!td->lock->q->pushElement(&el)){asm volatile ("pause");}
+	while(!td->lock->q->pushElement(&el));
 
 #endif
 
