@@ -509,6 +509,7 @@ inline void pushWork (volatile fp * lck, fp func)
 	}while(!success);
 }
 
+
 #define lock_init(lock) \
 	pthread_spin_init(&lock->n, PTHREAD_PROCESS_PRIVATE);\
 	lock->func = NULL;
