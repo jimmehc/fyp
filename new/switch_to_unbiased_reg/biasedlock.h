@@ -13,7 +13,7 @@ struct threaddata
 	int *threadid;
 
 	//shared
-	int * x;
+	volatile int * x;
 	volatile Lock *lock;
 	volatile bool done;
 	volatile bool * biased_mode;
@@ -36,6 +36,55 @@ struct Lock {
 
 #define non_dom_crit_sec() \
 	x = x + 1;
+
+#endif
+
+#ifdef VASVARRS
+struct Lock {
+	pthread_spinlock_t n;
+	bool request;
+	bool grant;
+};
+
+#define lock_init(lock) \
+	pthread_spin_init(&lock->n, PTHREAD_PROCESS_PRIVATE); \
+	lock->request = false; \
+	lock->grant = false;
+
+#define biased_lock_owner(lock) 
+#define biased_unlock_owner(lock)	\
+	if(lock->request) \
+	{	\
+		*td->x = x;\
+		lock->request = false; \
+		asm volatile ("mfence");\
+		lock->grant = true;\
+		while(lock->grant){asm volatile ("pause");}\
+		x = *td->x;\
+	}
+
+#define biased_lock(lock) \
+	pthread_spin_lock(&(lock->n)); \
+	if(*td->biased_mode)\
+	{\
+		lock->request = true; \
+		while(!lock->grant)\
+		{ \
+			if(!(*td->biased_mode))\
+			{\
+				break;\
+			}\
+			asm volatile ("pause"); \
+		}\
+	}
+
+#define biased_unlock(lock) \
+	asm volatile ("mfence"); \
+	lock->grant = false; \
+	pthread_spin_unlock(&(lock->n));
+
+#define non_dom_crit_sec() \
+	(*td->x) = (*td->x) + 1;
 
 #endif
 
@@ -175,7 +224,7 @@ struct Lock {
 	{	\
 		switch(lock->token) 	/*Change to function handling messages?*/ \
 		{ 			\
-		case 1: \
+			case 1: \
 				x = x + 1; \
 				lock->token = 0;\
 				lock->done = 1;\

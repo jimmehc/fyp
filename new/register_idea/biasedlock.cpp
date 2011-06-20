@@ -32,12 +32,13 @@ void foo(threaddata * td)
 		{
 			biased_unlock_owner(lock);
 		}
+		*td->x = x;
 #endif
 	}
 	else
 	{
-		timespec * t = new timespec;
-		t->tv_nsec = 1;
+//		timespec * t = new timespec;
+//		t->tv_nsec = 100000;
 		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock(lock);
@@ -67,13 +68,16 @@ int main()
 	lock_init(lck);
 
 	threaddata j[NUM_THREADS];
-	
+
+	int * x = new int(0);
+		
 	start = get_time();
 
 	for(int i = 0; i < NUM_THREADS; i++)
 	{
 		j[i].lock = lck;
 		j[i].threadid = new int(i);
+		j[i].x = x;
 		j[i].done = false;
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) &j[i] );
 	}
@@ -96,6 +100,8 @@ int main()
 #endif
 
 	volatile unsigned long long end = get_time();
+
+	std::cout << "x: " << *x << std::endl;
 
 	std::cout << "time: " << end-start << std::endl;
 }
