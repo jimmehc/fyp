@@ -1,6 +1,6 @@
 #include "biasedlock.h"
 #include "../lib/biased_sync.h"
-#include "../../lib/timing.h"
+#include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
 #include <pthread.h>

@@ -13,7 +13,7 @@ inline void lockN (volatile int * lck)
 	success = CAS(lck, 0, 1);
 	while(!success)	
 	{
-		for (int i =0; i < SPIN_COUNT; i++) { asm volatile("pause"); }
+		for (int i =0; i < SPIN_COUNT; i++) {  }
 		success = CAS(lck, 0, 1);
 	}
 }

@@ -33,7 +33,7 @@ void poll(shared_data<T> * sd, void * params){
 	{	
 		sd->l.func (sd,sd->l.params );
 		sd->l.func = NULL;
-		asm volatile("mfence");
+		asm volatile("sync");
 	}
 }
 #endif
@@ -43,14 +43,14 @@ template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid){
 	spinlock::lockN(sd->l.n);
 	sd->l.params = params;
-	asm volatile ("mfence");
+	asm volatile ("sync");
 	sd->l.func = work;
 	while (sd->l.func != NULL){ 
 		if (!(sd->l.biased_mode)){
 			work(sd, params);
 			break;
 		}
-		asm volatile ("pause"); 
+		 
 	}
 	spinlock::unlockN(sd->l.n);
 }
@@ -60,9 +60,9 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid){
 	spinlock::lockN(sd->l.n);
-	while (sd->l.func != NULL){ asm volatile ("pause"); }
+	while (sd->l.func != NULL){  }
 	sd->l.params = params;
-	asm volatile ("mfence");
+	asm volatile ("sync");
 	sd->l.func = work;
 	spinlock::unlockN (sd->l.n);
 }
@@ -76,7 +76,7 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	int success = 0;
 	do
 	{
-		while (sd->l.func != NULL) {asm volatile ("pause");}
+		while (sd->l.func != NULL) {}
 		success = CAS(&sd->l.func, NULL, work);
 	}while(!success);
 }
@@ -117,7 +117,7 @@ template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid){
 	spinlock::lockN(sd->l.n);
 	sd->l.params = params;
-	while(!sd->l.q->pushElement(&work)) {asm volatile ("pause");}
+	while(!sd->l.q->pushElement(&work)) {}
 	spinlock::unlockN(sd->l.n);
 }
 
@@ -149,18 +149,18 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 		if(sd->l.request) 
 		{	
 			sd->l.request = false; 
-			asm volatile ("mfence");
+			asm volatile ("sync");
 			sd->l.grant = true;
-			while(sd->l.grant){asm volatile ("pause");}
+			while(sd->l.grant){}
 		}
 	}
 	template <typename T>
 	void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid){
 		spinlock::lockN(sd->l.n); 
 		sd->l.request = true; 
-		while(!sd->l.grant){ asm volatile ("pause"); }
+		while(!sd->l.grant){  }
 		work(sd, params);
-		asm volatile ("mfence"); 
+		asm volatile ("sync"); 
 		sd->l.grant = false; 
 		spin::unlockN(sd->l.n);
 	}
@@ -204,9 +204,9 @@ template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid){
 	spinlock::lockN(sd->l.n);
 	sd->l.done[threadid] = false;
-	asm volatile("mfence");
-	while(!sd->l.q->pushElement(&work)) {asm volatile ("pause"); }
-	while(!sd->l.done[threadid]) { asm volatile("pause"); }
+	asm volatile("sync");
+	while(!sd->l.q->pushElement(&work)) { }
+	while(!sd->l.done[threadid]) {  }
 	spinlock::unlockN(sd->l.n);
 }
 

@@ -1,6 +1,6 @@
 #include "biasedlock.h"
 #include "../lib/biased_sync.h"
-#include "../../lib/timing.h"
+#include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
 #include <pthread.h>
@@ -34,7 +34,7 @@ void foo(threaddata<int> * td)
 	for(int i = 0; i < NUM_ITS; i++)
 		critical_section(td->threadid, &inc, td->sd);
 
-	asm volatile ("mfence");
+	asm volatile ("sync");
 #ifdef SWITCH	
 	critical_section(td->threadid, &switch_to_unbiased, td->sd);
 #endif

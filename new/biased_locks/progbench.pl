@@ -22,7 +22,7 @@ if($opt_l)
 }
 else
 {
-	@options = ("100000", "10000", "1000", "100", "50", "25","10","5","4","3","2","1");
+	@options = ("100000", "10000", "1000");#, "100", "50", "25","10","5","4","3","2","1");
 }
 
 if($opt_d)
@@ -168,87 +168,87 @@ sub process_raw_data
 }
 
 
-sub output_dom_acc_graph_file
-{
-	open FILE, ">","results/$filename.gr" or die "WAT";
+#sub output_dom_acc_graph_file
+#{
+#	open FILE, ">","results/$filename.gr" or die "WAT";
 
-	print FILE "=cluster;";
+#	print FILE "=cluster;";
 	
-	foreach $algorithm (@all_algorithms)
-	{
-		switch($algorithm)
-		{
-			case "SPL" { print FILE "Spinlock;"; }
-			case "PTM" { print FILE "Pthread Mutex;"; }
-			case "CTRL" {print FILE "Control;"; }
-			case "VAS" { print FILE "Asymmetric (Vasuvedan);"; }
-			case "VASVAR" { print FILE "Asymmetric Variation;"; }
-			case "FP" { print FILE "Function Pointer Passing;"; }
-			case "AFP" { print FILE "Asynchronous Function Pointer Passing;"; }
-			case "MP" { print FILE "Message Passing;"; }
-			case "AMP" { print FILE "Asynchronous Message Passing;"; }
-			case "ISPL" { print FILE "Integrated Spinlock;"; }
-			case "ISPLMP" { print FILE "Integrated Message Passing Spinlock;"; }
-			case "QFP" { print FILE "Queue of Function Pointers;"; }
-			case "MPQ" { print FILE "Queue of Messages;"; }
-			case "FPR" { print FILE "Function Pointer Passing (Register);"; }
-			case "AFPR" { print FILE "Asynchronous Function Pointer Passing (Register);"; }
-			case "MPR" { print FILE "Message Passing (Register);"; }
-			case "AMPR" { print FILE "Asynchronous Message Passing (Register);"; }
-			case "ISPLR" { print FILE "Integrated Spinlock (Register);"; }
-			case "ISPLMPR" { print FILE "Integrated Message Passing Spinlock (Register);"; }
-			case "QFPR" { print FILE "Queue of Function Pointers (Register);"; }
-			case "MPQR" { print FILE "Queue of Messages (Register)"; }
-		}
-	}
-
-	print FILE "\n=table\nyformat=%g\n=norotate\nylabel=Speedup\nxlabel=Dominance\n\n"; 
-
-
-	print FILE "#";
-	foreach $algorithm (@all_algorithms)
-	{
-		print FILE $algorithm;
-		print FILE " ";
-	}
-
-	print FILE "\n";
-
-	foreach $option (@options)
-	{
-		switch($option)
-		{
-			case "100000" { print FILE "99.999"; }
-			case "10000" { print FILE "99.99"; }
-			case "1000" { print FILE "99.9"; }
-			case "100" { print FILE "99"; }
-			case "25" { print FILE "96"; }
-			case "10" { print FILE "90"; }
-			case "" { print FILE "85"; }
-			case "5" { print FILE "80"; }
-			case "SF" { print FILE "75"; }
-			case "S" { print FILE "70"; }
-		}
-		print FILE " ";
-		foreach $algorithm (@all_algorithms)
-		{
-#		if($algorithm ne "control")
+#	foreach $algorithm (@all_algorithms)
+#	{
+#		switch($algorithm)
 #		{
-				if($arr{"SPL"}{$option}[1] != 0)
-				{
-					print FILE $arr{$algorithm}{$option}[1]/$arr{"SPL"}{$option}[1];
-				}
-				else
-				{
-					print FILE 0;
-				}
-				print FILE " ";
+#			case "SPL" { print FILE "Spinlock;"; }
+#			case "PTM" { print FILE "Pthread Mutex;"; }
+#			case "CTRL" {print FILE "Control;"; }
+#			case "VAS" { print FILE "Asymmetric (Vasuvedan);"; }
+#			case "VASVAR" { print FILE "Asymmetric Variation;"; }
+#			case "FP" { print FILE "Function Pointer Passing;"; }
+#			case "AFP" { print FILE "Asynchronous Function Pointer Passing;"; }
+#			case "MP" { print FILE "Message Passing;"; }
+#			case "AMP" { print FILE "Asynchronous Message Passing;"; }
+#			case "ISPL" { print FILE "Integrated Spinlock;"; }
+#			case "ISPLMP" { print FILE "Integrated Message Passing Spinlock;"; }
+#			case "QFP" { print FILE "Queue of Function Pointers;"; }
+#			case "MPQ" { print FILE "Queue of Messages;"; }
+#			case "FPR" { print FILE "Function Pointer Passing (Register);"; }
+#			case "AFPR" { print FILE "Asynchronous Function Pointer Passing (Register);"; }
+#			case "MPR" { print FILE "Message Passing (Register);"; }
+#			case "AMPR" { print FILE "Asynchronous Message Passing (Register);"; }
+#			case "ISPLR" { print FILE "Integrated Spinlock (Register);"; }
+#			case "ISPLMPR" { print FILE "Integrated Message Passing Spinlock (Register);"; }
+#			case "QFPR" { print FILE "Queue of Function Pointers (Register);"; }
+#			case "MPQR" { print FILE "Queue of Messages (Register)"; }
 #		}
-		}
-		print FILE "\n";
-	}
-	close FILE;
-}
+#	}
+#
+#	print FILE "\n=table\nyformat=%g\n=norotate\nylabel=Speedup\nxlabel=Dominance\n\n"; 
+#
+#
+#	print FILE "#";
+#	foreach $algorithm (@all_algorithms)
+#	{
+#		print FILE $algorithm;
+#		print FILE " ";
+#	}
+#
+#	print FILE "\n";
+#
+#	foreach $option (@options)
+#	{
+#		switch($option)
+#		{
+#			case "100000" { print FILE "99.999"; }
+#			case "10000" { print FILE "99.99"; }
+#			case "1000" { print FILE "99.9"; }
+#			case "100" { print FILE "99"; }
+#			case "25" { print FILE "96"; }
+#			case "10" { print FILE "90"; }
+#			case "" { print FILE "85"; }
+#			case "5" { print FILE "80"; }
+#			case "SF" { print FILE "75"; }
+#			case "S" { print FILE "70"; }
+#		}
+#		print FILE " ";
+#		foreach $algorithm (@all_algorithms)
+#		{
+##		if($algorithm ne "control")
+##		{
+#				if($arr{"SPL"}{$option}[1] != 0)
+#				{
+#					print FILE $arr{$algorithm}{$option}[1]/$arr{"SPL"}{$option}[1];
+#				}
+#				else
+#				{
+#					print FILE 0;
+#				}
+#				print FILE " ";
+##		}
+#		}
+#		print FILE "\n";
+#	}
+#	close FILE;
+#}
 
 sub output_graph_file
 {

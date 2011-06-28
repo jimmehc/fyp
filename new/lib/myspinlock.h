@@ -13,7 +13,7 @@ namespace spinlock
 	success = CAS(lck, 0, 1);
 	while(!success)	
 	{
-		for (int i =0; i < SPIN_COUNT; i++) { asm volatile("pause"); }
+		for (int i =0; i < SPIN_COUNT; i++) {  }
 		success = CAS(lck, 0, 1);
 	}
 }*/
@@ -26,7 +26,7 @@ inline void lockN (volatile int * lck, int * contention)
 		(*contention)++;
 		do
 		{
-			for (int i =0; i < SPIN_COUNT; i++) { asm volatile("pause"); }
+			for (int i =0; i < SPIN_COUNT; i++) {  }
 			success = CAS(lck, 0, 1);
 		}while(!success);
 	}

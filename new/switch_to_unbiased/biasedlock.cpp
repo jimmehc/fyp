@@ -1,5 +1,5 @@
 #include "biasedlock.h"
-#include "../../lib/timing.h"
+#include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
 #include <pthread.h>
@@ -28,7 +28,7 @@ void foo(threaddata * td)
 		std::cout << "dom thread done" << std::endl;
 //		std::cout << *td->x << std::endl;
 		*td->biased_mode = false;
-		asm volatile ("mfence");
+		asm volatile ("sync");
 	}
 	else
 	{
@@ -91,7 +91,7 @@ int main()
 		pthread_join(threads[i], NULL);
 
 	j[0].done = true;
-	asm volatile ("mfence");
+	asm volatile ("sync");
 	//std::cout << "done should now be true " << &j[0].done << std::endl;
 	pthread_join(threads[0], NULL);
 #endif

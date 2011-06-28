@@ -8,7 +8,7 @@ _Z8get_timev:
 	pushq	%rbx
 .LCFI0:
 #APP
-# 7 "../../lib/timing.h" 1
+# 7 "../lib/timing.h" 1
 	xorl %eax,%eax
 cpuid
 rdtsc
@@ -100,7 +100,7 @@ _Z3fooP10threaddata:
 	movl	$1, 4(%rbx)
 #APP
 # 24 "biasedlock.cpp" 1
-	mfence
+	sync
 # 0 "" 2
 #NO_APP
 .L9:
@@ -124,7 +124,7 @@ _Z3fooP10threaddata:
 	movl	$1, 4(%rbx)
 #APP
 # 34 "biasedlock.cpp" 1
-	mfence
+	sync
 # 0 "" 2
 #NO_APP
 	jmp	.L40
@@ -163,7 +163,7 @@ _Z3fooP10threaddata:
 	jne	.L19
 	movb	$1, 24(%rbp)
 #APP
-# 7 "../../lib/timing.h" 1
+# 7 "../lib/timing.h" 1
 	xorl %eax,%eax
 cpuid
 rdtsc
@@ -344,7 +344,7 @@ main:
 	movq	%rax, %r14
 	movl	$0, (%rax)
 #APP
-# 7 "../../lib/timing.h" 1
+# 7 "../lib/timing.h" 1
 	xorl %eax,%eax
 cpuid
 rdtsc
@@ -419,7 +419,7 @@ rdtsc
 	movb	$1, 24(%rsp)
 #APP
 # 103 "biasedlock.cpp" 1
-	mfence
+	sync
 # 0 "" 2
 #NO_APP
 	movl	$24, %edx
@@ -474,7 +474,7 @@ rdtsc
 	xorl	%esi, %esi
 	call	pthread_join
 #APP
-# 7 "../../lib/timing.h" 1
+# 7 "../lib/timing.h" 1
 	xorl %eax,%eax
 cpuid
 rdtsc
