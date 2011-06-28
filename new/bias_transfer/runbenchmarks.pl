@@ -4,12 +4,11 @@ use Switch;
 use Getopt::Std;
 
 #filename,delay,long,execute,process,rawout,graphout
-&getopts("f:d:lxprgi:");
+&getopts("f:d:lxprg");
 
-my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "VASVARR", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
-#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
-#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
-my @algorithms_to_run = ("VASVAR", "FPR", "AFPR", "MPR", "AMPR", "ISPLR", "ISPLMPR", "QFPR", "MPQR");
+#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
+my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
+my @algorithms_to_run = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
 my @options;
 my %arr;
 
@@ -20,7 +19,7 @@ if($opt_l)
 }
 else
 {
-	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N","EF", "E", "SF", "S");
+	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N");
 }
 
 if($opt_d)
@@ -100,7 +99,6 @@ sub run_tests
 				case "FP" { print "Function Pointer Passing"; }
 				case "AFP" { print "Asynchronous Function Pointer Passing"; }
 				case "MP" { print "Message Passing"; }
-				case "AMP" { print "Asynchronous Message Passing"; }
 				case "ISPL" { print "Integrated Spinlock"; }
 				case "ISPLMP" { print "Integrated Message Passing Spinlock"; }
 				case "QFP" { print "Queue of Function Pointers"; }
@@ -119,20 +117,16 @@ sub run_tests
 			print "\n";
 			print `make DELAY=$delay ALG=$algorithm DOM=$option TP=LOOP`;
 		
-			my @res;
-			for($i = 0; $i < $opt_i; $i++)
+			$output = `./asymmetric`;
+			if($output =~ m/Tipping point/)
 			{
-				$output = `./asymmetric`;
-				$output =~ m/time: (.*)/;
-				$res[$i] = $1;
-				print $output;
+				$arr{$algorithm}{$option} = 0;
 			}
-
-			@res = sort {$a <=> $b} @res;
-			$mid = $opt_i/2;
-
-			$arr{$algorithm}{$option} = $res[$mid];
-	
+			else
+			{
+				$output =~ m/time: (.*)/;
+				$arr{$algorithm}{$option} = $1;
+			}
 			print $arr{$algorithm}{$option};
 			print "\n";
 		}
@@ -187,7 +181,6 @@ sub output_graph_file
 			case "ISPLMP" { print FILE "Integrated Message Passing Spinlock;"; }
 			case "QFP" { print FILE "Queue of Function Pointers;"; }
 			case "MPQ" { print FILE "Queue of Messages;"; }
-			case "VASVARR" { print FILE "Asymmetric VariationREG;"; }
 			case "FPR" { print FILE "Function Pointer Passing (Register);"; }
 			case "AFPR" { print FILE "Asynchronous Function Pointer Passing (Register);"; }
 			case "MPR" { print FILE "Message Passing (Register);"; }
@@ -269,8 +262,8 @@ sub raw_output
 
 sub make_graph
 {
-	#print `perl ../../bargraph.pl -png results/$filename.gr > graphs/$filename.png`;
-	print `scp results/$filename.gr 134.226.38.27:~/results/.`;
+	print `perl ../../bargraph.pl -png results/$filename.gr > graphs/$filename.png`;
+	print `scp graphs/$filename.png 134.226.38.27:~/results/.`;
 }
 
 

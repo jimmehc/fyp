@@ -3,13 +3,15 @@
 use Switch;
 use Getopt::Std;
 
-#filename,delay,long,execute,process,rawout,graphout
-&getopts("f:d:lxprgi:");
+#filename,delay,long,execute,process,rawout,graphout,nondom,iterations
+&getopts("f:d:lxprgni:");
 
-my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "VASVARR", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
-#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
-#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
-my @algorithms_to_run = ("VASVAR", "FPR", "AFPR", "MPR", "AMPR", "ISPLR", "ISPLMPR", "QFPR", "MPQR");
+print $opt_i;
+
+#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
+#my @all_algorithms = ("SPL", "MYSPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
+my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ");
+my @algorithms_to_run = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
 my @options;
 my %arr;
 
@@ -20,7 +22,7 @@ if($opt_l)
 }
 else
 {
-	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N","EF", "E", "SF", "S");
+	@options = ("100000", "10000", "1000", "100", "50", "25","10","5","4","3","2","1");
 }
 
 if($opt_d)
@@ -36,7 +38,7 @@ $machinename = `hostname -s`;
 $num = `ls -l results|wc -l` + 1;
 chomp($machinename);
 
-$filename = $machinename."_delay".$delay."_".$num;
+$filename = "PROGRESS_".$machinename."_delay".$delay."_".$num;
 
 print $filename;
 print "\n";
@@ -64,7 +66,7 @@ if($opt_r)
 
 if($opt_g)
 {
-	&output_graph_file;
+	&output_dom_acc_graph_file;
 	&make_graph;
 }
 
@@ -75,16 +77,13 @@ sub run_tests
 	{
 		switch($option)
 		{
-			case "NNPNNN" { print "99.999% Dominance"; }
-			case "NNPNN" { print "99.99% Dominance"; }
-			case "NNPN" { print "99.9% Dominance"; }
-			case "NN" { print "99% Dominance"; }
-			case "NF" { print "95% Dominance"; }
-			case "N" { print "90% Dominance"; }
-			case "EF" { print "85% Dominance"; }
-			case "E" { print "80% Dominance"; }
-			case "SF" { print "75% Dominance"; }
-			case "S" { print "70% Dominance"; }
+			case "100000" { print "99.999% Dominance"; }
+			case "10000" { print "99.99% Dominance"; }
+			case "1000" {print "99.9% Dominance"; }
+			case "100" { print "99% Dominance"; }
+			case "25" { print "95% Dominance"; }
+			case "10" { print "90% Dominance"; }
+			case "5" { print "80% Dominance"; }
 		}
 
 		print "\n";
@@ -117,23 +116,30 @@ sub run_tests
 			
 			}
 			print "\n";
-			print `make DELAY=$delay ALG=$algorithm DOM=$option TP=LOOP`;
-		
-			my @res;
+			print `make progress NDD=$option ALG=$algorithm `;
+
+			my @domres;
+			my @nondomres;
 			for($i = 0; $i < $opt_i; $i++)
 			{
 				$output = `./asymmetric`;
-				$output =~ m/time: (.*)/;
-				$res[$i] = $1;
+				$output =~ m/dom progress: (.*) a/;
+				$domres[$i] = $1;
+				$output =~ m/non-dom progress: (.*) a/;
+				$nondomres[$i] = $1;
 				print $output;
 			}
+			@domres = sort {$a <=> $b} @domres;
+			@nondomres = sort {$a <=> $b} @nondomres;
 
-			@res = sort {$a <=> $b} @res;
 			$mid = $opt_i/2;
 
-			$arr{$algorithm}{$option} = $res[$mid];
+			$arr{$algorithm}{$option}[0] = $domres[$mid];	
+			$arr{$algorithm}{$option}[1] = $nondomres[$mid];
 	
-			print $arr{$algorithm}{$option};
+			print $arr{$algorithm}{$option}[0];
+			print "\n";
+			print $arr{$algorithm}{$option}[1];
 			print "\n";
 		}
 		print "\n";
@@ -153,19 +159,17 @@ sub process_raw_data
 	{	
 		@alginfo = split(/ /, $line);
 		$algorithm = $alginfo[0];
-		for($i = 1; $i < @alginfo; $i = $i + 2)
+		for($i = 1; $i < @alginfo; $i = $i + 3)
 		{
-			$arr{$algorithm}{$alginfo[$i]} = $alginfo[$i+1];
+			$arr{$algorithm}{$alginfo[$i]}[0] = $alginfo[$i+1];
+			$arr{$algorithm}{$alginfo[$i]}[1] = $alginfo[$i+2];
 		}
 	}
 }
 
 
-
-sub output_graph_file
+sub output_dom_acc_graph_file
 {
-
-
 	open FILE, ">","results/$filename.gr" or die "WAT";
 
 	print FILE "=cluster;";
@@ -187,7 +191,6 @@ sub output_graph_file
 			case "ISPLMP" { print FILE "Integrated Message Passing Spinlock;"; }
 			case "QFP" { print FILE "Queue of Function Pointers;"; }
 			case "MPQ" { print FILE "Queue of Messages;"; }
-			case "VASVARR" { print FILE "Asymmetric VariationREG;"; }
 			case "FPR" { print FILE "Function Pointer Passing (Register);"; }
 			case "AFPR" { print FILE "Asynchronous Function Pointer Passing (Register);"; }
 			case "MPR" { print FILE "Message Passing (Register);"; }
@@ -199,7 +202,7 @@ sub output_graph_file
 		}
 	}
 
-	print FILE "\n=table\nyformat=%gx\n=norotate\nylabel=Speedup\nxlabel=Dominance Percentage\n\n"; 
+	print FILE "\n=table\nyformat=%g\n=norotate\nylabel=Speedup\nxlabel=Dominance\n\n"; 
 
 
 	print FILE "#";
@@ -215,14 +218,14 @@ sub output_graph_file
 	{
 		switch($option)
 		{
-			case "NNPNNN" { print FILE "99.999"; }
-			case "NNPNN" { print FILE "99.99"; }
-			case "NNPN" { print FILE "99.9"; }
-			case "NN" { print FILE "99"; }
-			case "NF" { print FILE "95"; }
-			case "N" { print FILE "90"; }
-			case "EF" { print FILE "85"; }
-			case "E" { print FILE "80"; }
+			case "100000" { print FILE "99.999"; }
+			case "10000" { print FILE "99.99"; }
+			case "1000" { print FILE "99.9"; }
+			case "100" { print FILE "99"; }
+			case "25" { print FILE "96"; }
+			case "10" { print FILE "90"; }
+			case "" { print FILE "85"; }
+			case "5" { print FILE "80"; }
 			case "SF" { print FILE "75"; }
 			case "S" { print FILE "70"; }
 		}
@@ -231,9 +234,9 @@ sub output_graph_file
 		{
 #		if($algorithm ne "control")
 #		{
-				if($arr{$algorithm}{$option} != 0)
+				if($arr{"SPL"}{$option}[1] != 0)
 				{
-					print FILE $arr{"SPL"}{$option}/$arr{$algorithm}{$option};
+					print FILE $arr{$algorithm}{$option}[1]/$arr{"SPL"}{$option}[1];
 				}
 				else
 				{
@@ -241,6 +244,53 @@ sub output_graph_file
 				}
 				print FILE " ";
 #		}
+		}
+		print FILE "\n";
+	}
+	close FILE;
+}
+
+sub output_graph_file
+{
+
+
+	open FILE, ">","results/$filename.gr" or die "WAT";
+
+	print FILE "=stackcluster; Dom Accesses; Non-dom Accesses;";
+	
+	print FILE "\n=table\nyformat=%g%%\n=norotate\nylabel=Actual Access Percentage\nxlabel=Theoretical Dominance Percentage\n\n"; 
+
+	print FILE "\n";
+
+	foreach $option (@options)
+	{
+		print FILE "multimulti=";
+		switch($option)
+		{
+			case "100000" { print FILE "99.999"; }
+			case "10000" { print FILE "99.99"; }
+			case "1000" { print FILE "99.9"; }
+			case "100" { print FILE "99"; }
+			case "25" { print FILE "95"; }
+			case "10" { print FILE "90"; }
+			case "5" { print "80"; }
+		}
+		print FILE "\n";
+		foreach $algorithm (@all_algorithms)
+		{
+			print FILE $algorithm;
+			print FILE " ";
+			if($arr{$algorithm}{$option}[0] != 0)
+			{
+				print FILE ($arr{$algorithm}{$option}[0] * 100)/($arr{$algorithm}{$option}[0] + $arr{$algorithm}{$option}[1]);
+				print FILE " ";
+				print FILE ($arr{$algorithm}{$option}[1] * 100)/($arr{$algorithm}{$option}[0] + $arr{$algorithm}{$option}[1]);
+			}
+			else
+			{
+				print FILE 0;
+			}
+			print FILE "\n";
 		}
 		print FILE "\n";
 	}
@@ -259,7 +309,9 @@ sub raw_output
 		{
 			print FILE $option;
 			print FILE " ";
-			print FILE $arr{$algorithm}{$option};
+			print FILE $arr{$algorithm}{$option}[0];
+			print FILE " ";
+			print FILE $arr{$algorithm}{$option}[1];
 			print FILE " ";
 		}	
 		print FILE "\n";
@@ -267,11 +319,16 @@ sub raw_output
 	close FILE;
 }
 
+#sub make_graph
+#{
+#	print `perl ../../bargraph.pl -png results/$filename.gr > graphs/$filename.png`;
+#	print `scp graphs/$filename.png 134.226.38.27:~/results/.`;
+#}
+
 sub make_graph
 {
-	#print `perl ../../bargraph.pl -png results/$filename.gr > graphs/$filename.png`;
+#	print `perl ../../bargraph.pl -png results/$filename.gr > graphs/$filename.png`;
 	print `scp results/$filename.gr 134.226.38.27:~/results/.`;
 }
-
 
 

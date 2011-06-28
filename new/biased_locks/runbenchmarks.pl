@@ -4,10 +4,11 @@ use Switch;
 use Getopt::Std;
 
 #filename,delay,long,execute,process,rawout,graphout
-&getopts("f:d:lxprg");
+&getopts("f:d:lxprgi:");
 
 #my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
-my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
+#my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
+my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
 my @algorithms_to_run = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
 my @options;
 my %arr;
@@ -19,7 +20,7 @@ if($opt_l)
 }
 else
 {
-	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N");
+	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N","EF", "E", "SF", "S");
 }
 
 if($opt_d)
@@ -99,6 +100,7 @@ sub run_tests
 				case "FP" { print "Function Pointer Passing"; }
 				case "AFP" { print "Asynchronous Function Pointer Passing"; }
 				case "MP" { print "Message Passing"; }
+				case "AMP" { print "Asynchronous Message Passing"; }
 				case "ISPL" { print "Integrated Spinlock"; }
 				case "ISPLMP" { print "Integrated Message Passing Spinlock"; }
 				case "QFP" { print "Queue of Function Pointers"; }
@@ -117,16 +119,20 @@ sub run_tests
 			print "\n";
 			print `make DELAY=$delay ALG=$algorithm DOM=$option TP=LOOP`;
 		
-			$output = `./asymmetric`;
-			if($output =~ m/Tipping point/)
+			my @res;
+			for($i = 0; $i < $opt_i; $i++)
 			{
-				$arr{$algorithm}{$option} = 0;
-			}
-			else
-			{
+				$output = `./asymmetric`;
 				$output =~ m/time: (.*)/;
-				$arr{$algorithm}{$option} = $1;
+				$res[$i] = $1;
+				print $output;
 			}
+
+			@res = sort {$a <=> $b} @res;
+			$mid = $opt_i/2;
+
+			$arr{$algorithm}{$option} = $res[$mid];
+	
 			print $arr{$algorithm}{$option};
 			print "\n";
 		}

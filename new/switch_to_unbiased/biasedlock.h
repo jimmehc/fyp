@@ -38,7 +38,7 @@ struct Lock {
 
 #ifdef MYSPL 
 
-#include "myspinlock.h"
+#include "../lib/myspinlock.h"
 
 struct Lock {
 	int n;

@@ -11,7 +11,7 @@ void foo(threaddata * td)
 	volatile Lock * lock = td->lock;
 	if(*(td->threadid) == 0)
 	{
-		for(long i = 0; i < DOM_ACCESSES; i++)
+		for(int i = 0; i < DOM_ACCESSES; i++)
 		{
 			biased_lock_owner(lock);
 
@@ -38,8 +38,8 @@ void foo(threaddata * td)
 	else
 	{
 		timespec * t = new timespec;
-		t->tv_nsec = 1000000000;
-		for(long i = 0; i < NON_DOM_ACCESSES; i++)
+		t->tv_nsec = 1;
+		for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		{
 			biased_lock(lock);
 
@@ -50,7 +50,7 @@ void foo(threaddata * td)
 			non_dom_crit_sec();
 
 			biased_unlock(lock);
-			//nanosleep(t,NULL);	
+//			nanosleep(t,NULL);	
 		}
 		td->done = true;
 //		std::cout << "time: " << get_time() - start << std::endl;
@@ -67,7 +67,7 @@ int main()
 	lock_init(lck);
 
 	threaddata j[NUM_THREADS];
-	volatile long * x = new long(0);
+	volatile int * x = new int(0);
 
 	start = get_time();
 
@@ -77,8 +77,6 @@ int main()
 		j[i].lock = lck;
 		j[i].threadid = new int(i);
 		j[i].done = false;
-		j[i].contention = new int(0);
-		for(volatile int k = 0; k < 1000; k++);
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) &j[i] );
 	}	
 
@@ -100,14 +98,7 @@ int main()
 
 	volatile unsigned long long end = get_time();
 
-	int totalcontention = 0;
-	for(int i = 1; i < NUM_THREADS; i++)
-		totalcontention += *(j[i].contention);
-
 	std::cout << "time: " << end-start << std::endl;
-
-	std::cout << "contended lock accesses by non doms: " << totalcontention << std::endl;
-	std::cout << (double)(totalcontention*100)/(double)(NON_DOM_ACCESSES*(NUM_THREADS-1)) << "%" << std::endl;
 
 	std::cout << "x: " << *x << std::endl;
 }
