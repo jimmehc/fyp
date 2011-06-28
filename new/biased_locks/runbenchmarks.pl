@@ -117,7 +117,7 @@ sub run_tests
 			
 			}
 			print "\n";
-			print `make DELAY=$delay ALG=$algorithm DOM=$option TP=LOOP`;
+			print `make DELAY=$delay ALG=$algorithm DOM=$option`;
 		
 			my @res;
 			for($i = 0; $i < $opt_i; $i++)

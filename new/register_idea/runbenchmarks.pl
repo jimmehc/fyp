@@ -21,6 +21,8 @@ if($opt_l)
 else
 {
 	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N","EF", "E", "SF", "S");
+	#@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NF","N");
+	@options = ("NF","N");
 }
 
 if($opt_d)
@@ -195,7 +197,9 @@ sub output_graph_file
 			case "ISPLR" { print FILE "Integrated Spinlock (Register);"; }
 			case "ISPLMPR" { print FILE "Integrated Message Passing Spinlock (Register);"; }
 			case "QFPR" { print FILE "Queue of Function Pointers (Register);"; }
-			case "MPQR" { print FILE "Queue of Messages (Register)"; }
+			case "MPQR" { print FILE "Queue of Messages (Register);"; }
+			case "FPRS" { print FILE "Function Pointer Passing (Switch2Unbiased);"; }
+			case "MPRS" { print FILE "Message Passing (Switch2Unbiased)"; }
 		}
 	}
 

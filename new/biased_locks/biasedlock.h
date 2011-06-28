@@ -404,7 +404,7 @@ inline void pushWork (volatile fp * lck, fp func)
 	int success = 0;
 	do
 	{
-		while (*lck != NULL) {asm volatile ("pause");}
+		while (*lck != NULL) ;
 		success = CAS(lck, NULL, func);
 	}while(!success);
 }
@@ -516,7 +516,7 @@ void (*func)(volatile long * y, volatile Lock * l);
 
 #define non_dom_crit_sec() \
 	func = &incy;	\
-	while(!td->lock->q->pushElement(&func)) {asm volatile ("pause");}
+	while(!td->lock->q->pushElement(&func));
 
 inline void incy (volatile long * y, volatile Lock * l)
 {
@@ -563,7 +563,7 @@ int el;
 
 #define non_dom_crit_sec() \
 	el = 1;	\
-	while(!td->lock->q->pushElement(&el)){asm volatile ("pause");}
+	while(!td->lock->q->pushElement(&el));
 
 #endif
 

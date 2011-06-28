@@ -1,5 +1,5 @@
 all:
-	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -D${DOM} -DDELAY=${DELAY} -D${ALG} -O2 
+	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -D${DOM} -DDELAY=${DELAY} -D${ALG} -O3
 
 profile:
 	g++ -o asymmetric biasedlock.cpp -lpthread -Wall -Wextra -D${DOM} -DDELAY=${DELAY} -D${ALG} -O2 -pg -ggdb -fprofile-arcs -ftest-coverage

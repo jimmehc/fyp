@@ -1,0 +1,10 @@
+=cluster;Spinlock(baseline);One Function Pointer;Asynchronous FP;Message Passing;Asynchronous Message Passing;Function Pointer Queue;Message Passing Queue;
+=table
+yformat=%gx
+=norotate
+ylabel=Speedup
+xlabel=Dominance Percentage
+
+#SPL FP AFP MP AMP QFP MPQ 
+99.999 1 9.56155367568631 15.9722697726481 25.3963042250833 25.3453396114655 9.75868151912611 12.6321035801998 
+99.99 1 14.950326723559 14.8661089698606 24.355423559984 24.2001665460483 9.68293503345621 12.4394233810889 

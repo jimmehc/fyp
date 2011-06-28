@@ -1,6 +1,5 @@
 #ifndef MYQUEUE
 #define MYQUEUE
-#include <iostream>
 
 //taken from http://msmvps.com/blogs/vandooren/archive/2007/01/05/creating-a-thread-safe-producer-consumer-queue-in-c-without-using-locks.aspx
 
@@ -44,4 +43,5 @@ bool myqueue<T>::pushElement(T * Element)
         else
                 return false;
 }
+
 #endif
