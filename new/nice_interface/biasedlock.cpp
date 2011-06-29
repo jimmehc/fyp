@@ -22,9 +22,15 @@ void foo(threaddata<int> * td)
 	for(int i = 0; i < DOM_ACCESSES; i++)
 		critical_section_owner(td->threadid, &inc, td->sd);
 	
-	critical_section_owner(td->threadid, &switch_to_unbiased, td->sd);
-
+	//critical_section_owner(td->threadid, &switch_to_unbiased, td->sd);
+#ifdef LOOP
+	while(!td->done)
+	{
+		asm volatile ("pause");
+		poll(td->sd, NULL);
+	}
 	std::cout << "done" << std::endl;
+#endif
 }
 	
 
@@ -64,7 +70,7 @@ int main()
 
 	j[0].done = true;
 	asm volatile ("mfence");
-	//std::cout << "done should now be true " << &j[0].done << std::endl;
+	std::cout << "done should now be true " << &j[0].done << std::endl;
 	pthread_join(threads[0], NULL);
 #else
 //	pthread_join(threads[0], NULL);	//wait for dom thread

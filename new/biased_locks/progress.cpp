@@ -11,7 +11,7 @@ void foo(threaddata * td)
 	volatile Lock * lock = td->lock;
 	for(long i = 0; i < DOM_ACCESSES; i++)
 	{
-		for(volatile int j = 0; j < 1; j++);
+		for(volatile int j = 0; j < 1; j++){/* asm volatile ("pause");*/}
 		biased_lock_owner(lock);
 
 		*(td->x) = (*td->x) + 1;
@@ -29,12 +29,12 @@ void bar(threaddata * td)
 	td->done = true;
 	for(volatile int i = 0; i > -1; i++)
 	{
+		for(volatile int j = 0; j < (NON_DOM_DELAY*(NUM_THREADS - 1)); j++){ asm volatile("pause");}
 		biased_lock(lock);
 
 		non_dom_crit_sec();
 
 		biased_unlock(lock);
-		for(volatile int j = 0; j < (NON_DOM_DELAY*(NUM_THREADS - 1)); j++);
 	}
 	//std::cout << *contention << " contended lock accesses by non dom thread " << td->threadid << std::endl;
 }	
@@ -60,9 +60,9 @@ int main()
 		j[i].done = false;
 	}	
 
-	start = get_time();
 
 	pthread_create(&threads[0], NULL, (void* (*)(void*)) foo, (void *) &j[0] );
+	start = get_time();
 
 	for(int i = 1; i < NUM_THREADS; i++)
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) bar, (void *) &j[i] );
@@ -75,7 +75,7 @@ int main()
 	for(int i = 0; i < NUM_THREADS; i++)
 		totalcontention += *(j[i].contention);
 		
-	std::cout << (totalcontention*100)/(*x - DOM_ACCESSES) << "\% contended lock accesses by nondom threads" << std::endl;
+//	std::cout << (totalcontention*100)/(*x - DOM_ACCESSES) << "\% contended lock accesses by nondom threads" << std::endl;
 	std::cout << "time: " << end-start << std::endl;
 
 	std::cout << "x: " << *x << std::endl;

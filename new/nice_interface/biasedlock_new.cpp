@@ -1,5 +1,5 @@
 #include "biasedlock_new.h"
-#include "../../lib/timing.h"
+#include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
 #include <pthread.h>
@@ -16,23 +16,15 @@ inline void inc(shared_data<int> * sd, void * params = NULL){
 
 void foo(threaddata<int> * td)
 {
-	func_struct<int> fs;
-	fs.func = &inc;
-	fs.params = NULL;
-	shared_data<int> sd;
-
 	for(int i = 0; i < DOM_ACCESSES; i++)
-		critical_section(td->threadid, fs, td->sd);
+		critical_section(td->threadid, &inc, td->sd);
 }
 	
 
 void bar(threaddata<int> * td)
 {
-	func_struct<int> fs;
-	fs.func = &inc;
-	fs.params = NULL;
 	for(int i = 0; i < NON_DOM_ACCESSES; i++)
-		critical_section(td->threadid, fs, td->sd);
+		critical_section(td->threadid, &inc, td->sd);
 
 	td->done = true;
 }	

@@ -11,7 +11,7 @@ print $opt_i;
 #my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
 #my @all_algorithms = ("SPL", "MYSPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
 my @all_algorithms = ("SPL", "VAS", "VASVAR", "FPR", "AFPR", "MPR", "AMPR", "ISPLR", "ISPLMPR", "QFPR", "MPQR");
-my @algorithms_to_run = ("SPL", "VAS", "VASVAR", "FPR", "AFPR", "MPR", "AMPR", "ISPLR", "ISPLMPR", "QFPR", "MPQR");
+my @algorithms_to_run = ("FPR", "AFPR", "MPR", "AMPR", "ISPLR", "ISPLMPR", "QFPR", "MPQR");
 my @options;
 my %arr;
 
@@ -22,7 +22,7 @@ if($opt_l)
 }
 else
 {
-	@options = ("100000", "10000", "1000", "100", "50", "25","10","5","4","3","2","1");
+	@options = ("100000", "10000", "1000", "100", "50", "25","10","5");#,"4","3","2","1");
 }
 
 if($opt_d)
@@ -234,9 +234,9 @@ sub output_dom_acc_graph_file
 		{
 #		if($algorithm ne "control")
 #		{
-				if($arr{"SPL"}{$option}[1] != 0)
+				if($arr{"SPL"}{$option}[0] != 0)
 				{
-					print FILE $arr{$algorithm}{$option}[1]/$arr{"SPL"}{$option}[1];
+					print FILE $arr{$algorithm}{$option}[0]/$arr{"SPL"}{$option}[0];
 				}
 				else
 				{

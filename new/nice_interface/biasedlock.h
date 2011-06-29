@@ -11,7 +11,7 @@ struct threaddata
 
 	//shared
 	shared_data<T> * sd;
-	int done;
+	volatile int done;
 };
 
 

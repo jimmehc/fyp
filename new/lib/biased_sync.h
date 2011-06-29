@@ -17,6 +17,13 @@ struct shared_data{
 	T d;
 };
 
+template <typename T>
+struct func_struct
+{
+	void (*func)(shared_data<T> *, void *);
+	void * params;
+};
+
 
 template <typename T>
 void critical_section_owner (int threadid, void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params = NULL){

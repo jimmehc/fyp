@@ -1,4 +1,4 @@
-#define NUM_THREADS 8
+#define NUM_THREADS 8 
 
 #define DOM_ACCESSES 100000000 
 

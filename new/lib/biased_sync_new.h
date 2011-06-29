@@ -29,17 +29,17 @@ struct shared_data{
 
 
 template <typename T>
-void critical_section (int threadid, func_struct<T> fs, shared_data<T> * sd){
+void critical_section (int threadid, void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params = NULL){
 	if (sd->l.biased_mode){
 		if(threadid == sd->l.owner){
-			fs.func (sd, fs.params);
-			poll (sd, fs.params);
+			work (sd, params);
+			poll (sd, params);
 		} else {
-			push_work (fs.func, sd, fs.params);
+			push_work (work, sd, params);
 		}
 	} else {
 		pthread_spin_lock (sd->l.n);
-		fs.func (sd, fs.params);
+		work (sd, params);
 		pthread_spin_unlock (sd->l.n);
 	}
 }

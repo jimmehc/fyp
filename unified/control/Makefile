@@ -1,5 +1,5 @@
 nnpnnn:
-	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY}
+	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNNPNNN -DDELAY=${DELAY} -O3
 
 nnpnn:
 	g++ -o asymmetric control.cpp -lpthread -Wall -Wextra -DNNPNN -DDELAY=${DELAY}

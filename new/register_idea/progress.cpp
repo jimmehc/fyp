@@ -10,6 +10,7 @@ void foo(threaddata * td)
 {
 	int x = 0;
 	volatile Lock * lock = td->lock;
+	startoffoo();
 	for(int i = 0; i < DOM_ACCESSES; i++)
 	{
 		for(volatile int j = 0; j < 1; j++);
@@ -26,6 +27,7 @@ void foo(threaddata * td)
 void bar(threaddata * td)
 {
 	volatile Lock * lock = td->lock;
+	startoffoo();
 	td->done = true;
 	for(;;)
 	{
@@ -34,7 +36,7 @@ void bar(threaddata * td)
 		non_dom_crit_sec();
 
 		biased_unlock(lock);
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS - 1)); j++);
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS - 1)); j++){ asm volatile ("pause");}
 	}
 }	
 

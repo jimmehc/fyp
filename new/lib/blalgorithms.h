@@ -6,7 +6,10 @@
 template <typename T>
 struct shared_data;
 
-#if defined(FP) || defined(AFP) || defined(ISPL)
+template <typename T>
+struct func_struct;
+
+#if defined(FP) || defined(AFP)
 template <typename T>
 struct Lock{
 	int owner;
@@ -69,17 +72,50 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 #endif
 
 #ifdef ISPL
-
 #define CAS __sync_bool_compare_and_swap
+
+template <typename T>
+struct Lock{
+	int owner;
+	bool biased_mode;
+	volatile int * n;
+	func_struct<T> * fs;
+	Lock();
+};	
+
+template <typename T>
+Lock<T>::Lock(){
+	owner = 0;
+	biased_mode = true;
+	n = new int(0);
+	fs = NULL;
+}
+
 template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid){
+	func_struct<T> * fs = new func_struct<T>;
+	fs->func = work;
+	fs->params = params;
+
 	int success = 0;
-	do
+	success = CAS(&sd->l.fs, NULL, fs);
+	while(!success)	
 	{
-		while (sd->l.func != NULL) {asm volatile ("pause");}
-		success = CAS(&sd->l.func, NULL, work);
-	}while(!success);
+		for (int i = 0; i < 400; i++) {asm volatile ("pause");}
+		success = CAS(&sd->l.fs, NULL,fs);
+	}
 }
+
+template <typename T>
+void poll(shared_data<T> * sd, void * params){
+	if(sd->l.fs != NULL) 	
+	{	
+		sd->l.fs->func (sd,sd->l.fs->params );
+		sd->l.fs = NULL;
+		asm volatile("mfence");
+	}
+}
+
 #endif
 
 #ifdef FPQ	//XXX: CAN'T DO PARAMS SAFELY LIKE THIS

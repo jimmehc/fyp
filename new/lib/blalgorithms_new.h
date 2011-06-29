@@ -44,9 +44,11 @@ void poll(shared_data<T> * sd, void * params){
 template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params){
 	pthread_spin_lock(sd->l.n);
-	sd->l.fs.params = params;
+	volatile func_struct<T> fs;
+	fs.func = work;
+	fs.params = params;
+	sd->l.fs = fs;
 	asm volatile ("mfence");
-	sd->l.fs.func = work;
 	while (sd->l.fs.func != NULL){ asm volatile ("pause"); }
 	pthread_spin_unlock(sd->l.n);
 }
@@ -57,11 +59,14 @@ template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params){
 	pthread_spin_lock(sd->l.n);
 	while (sd->l.fs.func != NULL){ asm volatile ("pause"); }
-	sd->l.fs.params = params;
+	func_struct<T> fs;
+	fs.func = work;
+	fs.params = params;
+	sd->l.fs = fs;
 	asm volatile ("mfence");
-	sd->l.fs.func = work;
 	pthread_spin_unlock(sd->l.n);
 }
+
 #endif
 
 #ifdef ISPL
@@ -69,11 +74,15 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 #define CAS __sync_bool_compare_and_swap
 template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params){
+	func_struct<T> fs;
+	fs.func = work;
+	fs.params = params;
+
 	int success = 0;
 	do
 	{
-		while (sd->l.fs.func != NULL) {asm volatile ("pause");}
-		success = CAS(&sd->l.fs.func, NULL, work);
+		while (sd->l.fs != NULL) {asm volatile ("pause");}
+		success = CAS(&sd->l.fs, NULL, &fs);
 	}while(!success);
 }
 #endif

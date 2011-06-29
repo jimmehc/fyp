@@ -399,14 +399,17 @@ struct Lock {
 	void (*func)(volatile long * y, volatile Lock * l);
 };
 
+#undef SPIN_COUNT
+#define SPIN_COUNT 400
 inline void pushWork (volatile fp * lck, fp func)
 {
 	int success = 0;
-	do
+	success = CAS(lck, NULL, func);
+	while(!success)	
 	{
-		while (*lck != NULL) ;
+		for(int i = 0; i < SPIN_COUNT; i++){ asm volatile ("pause");}
 		success = CAS(lck, NULL, func);
-	}while(!success);
+	}
 }
 
 #define lock_init(lock) \
@@ -450,11 +453,12 @@ struct Lock {
 inline void pushWork (volatile int * lck, int token)
 {
 	int success = 0;
-	do
+	success = CAS(lck, 0, token);
+	while(!success)	
 	{
-		while (*lck != 0) { asm volatile ("pause"); }
+		for(int i = 0; i < SPIN_COUNT; i++){ asm volatile ("pause");}
 		success = CAS(lck, 0, token);
-	}while(!success);
+	}
 }
 
 #define lock_init(lock) \
@@ -568,3 +572,108 @@ int el;
 #endif
 
 #endif
+
+#ifdef ISPLBL
+typedef void (*fp)(volatile long*, volatile Lock*);
+
+#define CAS __sync_bool_compare_and_swap
+
+struct Lock {
+	void (*func)(volatile long * y, volatile Lock * l);
+	bool done;
+};
+#define SPIN_COUNT 400
+inline void pushWork (volatile fp * lck, fp func)
+{
+	int success = 0;
+	success = CAS(lck, NULL, func);
+	while(!success)	
+	{
+		for(int i = 0; i < SPIN_COUNT; i++){ asm volatile ("pause");}
+		success = CAS(lck, NULL, func);
+	}
+}
+
+#define lock_init(lock) \
+	lock->done = true;\
+	lock->func = NULL;
+
+#define biased_lock_owner(lock)  
+#define biased_unlock_owner(lock)	\
+	if(lock->func != NULL) 	\
+	{	\
+		lock->func (td->x, lock);		/*XXX: REVISIT*/\
+		lock->done = true;\
+		asm volatile("mfence");\
+	}
+	
+#define biased_lock(lock) \
+	pushWork(&lock->func, &incy);\
+	while(lock->func != NULL) {asm volatile("pause");}\
+	while(!lock->done) { asm volatile ("pause");}
+
+#define biased_unlock(lock) \
+	asm volatile ("mfence"); 
+
+#define non_dom_crit_sec() 
+
+inline void incy (volatile long * y, volatile Lock * l)
+{
+	l->done = false;
+	l->func = NULL;
+	asm volatile ("mfence");
+	#if DELAY
+	for(int j = 0; j < DELAY; j++) ;
+	#endif	
+	(*y) = (*y) + 1;
+}
+
+#endif
+
+#ifdef ISPLMPBL
+#define CAS __sync_bool_compare_and_swap
+
+struct Lock {
+	int token;
+	bool done;
+};
+
+inline void pushWork (volatile int * lck, int token)
+{
+	int success = 0;
+	success = CAS(lck, 0, token);
+	while(!success)	
+	{
+		for(int i = 0; i < SPIN_COUNT; i++){ asm volatile ("pause");}
+		success = CAS(lck, 0, token);
+	}
+}
+
+#define lock_init(lock) \
+	lock->token = 0;
+
+#define biased_lock_owner(lock)  
+#define biased_unlock_owner(lock)	\
+	if(lock->token) 	\
+	{	\
+		switch(lock->token) 	/*Change to function handling messages?*/ \
+		{ 			\
+			case 1: \
+				lock->token = 0;\
+				asm volatile("mfence");\
+				*td->x = *td->x + 1; \
+				break;\
+		}\
+	}
+	
+#define biased_lock(lock) \
+	pushWork(&lock->token, 1);
+
+#define biased_unlock(lock) \
+	asm volatile ("mfence"); 
+
+#define non_dom_crit_sec() 
+
+
+#endif
+
