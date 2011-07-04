@@ -1,5 +1,0 @@
-All three subdirectories contain code for the single threaded, naive multithreaded and pipelining & flow pinning version of the fake packet processor.
-
-The single threaded and flow pinning versions take a filename argument.  It takes files in the format explained in the report.
-
-The naive multithreaded version requires that four files, in the format outlined in the report, named "pkts1", "pkts2", "pkts3" and "pkts4" be placed in its directory.

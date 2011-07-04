@@ -7,25 +7,29 @@ cssize=( "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" )
 benchmarks=( biasedlock multiple overhead_to_sequential progress )
 algs=(SPL VAS FP AFP MP AMP ISPL ISPLMP FPQ MPQ BQ)
 
+for i in ${benchmarks[*]};do
+	mkdir $i
+done
+
 cd ..
 
-#for i in ${!domarr[*]};do
-#	for j in ${!algs[*]}; do
-#		echo `make biasedlock OUTPUT=binaries/biasedlock/$i\_$j DOM=${domarr[i]} ALG=${algs[j]}`;
-#	done
-#done
+for i in ${!domarr[*]};do
+	for j in ${!algs[*]}; do
+		echo `make biasedlock OUTPUT=binaries/biasedlock/$i\_$j DOM=${domarr[i]} ALG=${algs[j]}`;
+	done
+done
 
-#for i in ${!ndfarr[*]};do
-#	for j in ${!algs[*]}; do
-#		echo `make multiple OUTPUT=binaries/multiple/$i\_$j NDF=${ndfarr[i]} ALG=${algs[j]}`;
-#	done
-#done
+for i in ${!ndfarr[*]};do
+	for j in ${!algs[*]}; do
+		echo `make multiple OUTPUT=binaries/multiple/$i\_$j NDF=${ndfarr[i]} ALG=${algs[j]}`;
+	done
+done
 
-#for i in ${!nddarr[*]};do
-#	for j in ${!algs[*]}; do
-#		echo `make progress OUTPUT=binaries/progress/$i\_$j NDD=${nddarr[i]} ALG=${algs[j]}`;
-#	done
-#done
+for i in ${!nddarr[*]};do
+	for j in ${!algs[*]}; do
+		echo `make progress OUTPUT=binaries/progress/$i\_$j NDD=${nddarr[i]} ALG=${algs[j]}`;
+	done
+done
 
 for i in ${!cssize[*]};do
 	echo `make overhead_to_sequential_no_locks OUTPUT=binaries/overhead\_to\_sequential/nolocks\_$i CS_SIZE=${cssize[i]}`;
