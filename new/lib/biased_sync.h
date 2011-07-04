@@ -82,7 +82,7 @@ void msg_struct<T>::operator=(volatile const msg_struct& ms) volatile
 void message_handler(int token, shared_data<int> * sd, void * params){
 	switch(token){
 		case 1:		// inc
-			vol_inc(sd->d);
+			sd->d++;
 		break;
 		
 		case 2:		// dec
