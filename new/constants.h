@@ -1,3 +1,6 @@
+#ifndef CONSTANTS
+#define CONSTANTS
+
 #define NUM_THREADS 8 
 
 #define DOM_ACCESSES 100000000
@@ -44,3 +47,5 @@
 #define NON_DOM_ACCESSES 0
 #endif
 
+
+#endif

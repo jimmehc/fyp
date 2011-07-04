@@ -1,8 +1,9 @@
-#include "biasedlock.h"
+#include "multiple.h"
 #include "../lib/biased_sync.h"
-#include "../../lib/timing.h"
+#include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 #define NUM_ITS 100000000
@@ -17,11 +18,11 @@ int count = 0;
 
 volatile unsigned long long start;
 
-void inc(volatile shared_data<int> * sd, void * params = NULL){
+void inc(shared_data<int> * sd, void * params = NULL){
 	sd->d++;
 }
 
-void nothing(volatile shared_data<int> * sd, void * params = NULL){
+void nothing(shared_data<int> * sd, void * params = NULL){
 	for(volatile int i = 0; i < 10; i++);
 }
 
@@ -29,7 +30,7 @@ void foo(threaddata<int> * td)
 {
 	for(int i = 0; i < NUM_ITS; i++)
 	{
-		#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VASVAR)
+		#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VAS)
 		if(i % NDF == 0)
 			critical_section(td->threadid, &inc, td->sds[(td->threadid + 1)%NUM_THREADS], NULL, td->sds[td->threadid]);
 		else
@@ -66,9 +67,10 @@ void foo(threaddata<int> * td)
 	
 	while(!td->done)
 	{
-		asm volatile ("pause");
+		pause();
 		poll(td->sds[td->threadid], NULL);
 	}
+	restorepr();
 #endif
 }
 	

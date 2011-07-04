@@ -2,6 +2,7 @@
 #include "../../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 volatile unsigned long long start;

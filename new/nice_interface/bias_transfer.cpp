@@ -3,6 +3,7 @@
 #include "../../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 
@@ -35,7 +36,7 @@ void foo(threaddata<int> * td)
 	for(;;)
 	{
 		critical_section(td->threadid, &inc, td->sd);
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { asm volatile ("pause");}
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { pause();} restorepr(); 
 	}
 }
 void foo2(threaddata<int> * td)
@@ -44,7 +45,7 @@ void foo2(threaddata<int> * td)
 	for(int i = 0; i < NUM_ITS2; i++)
 	{
 		critical_section(td->threadid, &inc, td->sd);
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { asm volatile ("pause");}
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { pause();} restorepr(); 
 	}
 
 #ifdef SWITCH	
@@ -61,7 +62,7 @@ void bar(threaddata<int> * td)
 {
 	for(;;)
 	{
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { asm volatile ("pause");}
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { pause();} restorepr(); 
 		critical_section(td->threadid, &inc, td->sd);
 	}
 

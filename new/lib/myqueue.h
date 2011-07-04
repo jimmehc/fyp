@@ -1,6 +1,7 @@
 #ifndef MYQUEUE
 #define MYQUEUE
 #include <iostream>
+#include "volatile_functions.h"
 
 //taken from http://msmvps.com/blogs/vandooren/archive/2007/01/05/creating-a-thread-safe-producer-consumer-queue-in-c-without-using-locks.aspx
 
@@ -27,7 +28,7 @@ bool myqueue<T>::popElement(T * Element)
         int nextElement = (m_Read + 1) % Size;
         *Element = m_Data[m_Read];
         m_Read = nextElement;
-	asm volatile ("mfence");
+	fence();
         return true;
 }
 
@@ -39,7 +40,7 @@ bool myqueue<T>::pushElement(T * Element)
         {
                 m_Data[m_Write] = *Element;
                 m_Write = nextElement;
-		asm volatile ("mfence");
+		fence();
                 return true;
         }
         else

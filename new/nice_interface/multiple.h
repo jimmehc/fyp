@@ -13,7 +13,7 @@ struct threaddata
 
 
 	//shared
-	volatile shared_data<T> * sds[NUM_THREADS];
+	shared_data<T> * sds[NUM_THREADS];
 	volatile int done;
 };
 

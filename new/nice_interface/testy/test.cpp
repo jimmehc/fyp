@@ -1,4 +1,5 @@
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <stdlib.h>
 
 template <typename T>

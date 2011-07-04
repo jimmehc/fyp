@@ -12,6 +12,8 @@
 template <typename T>
 struct shared_data;
 
+template<typename T>
+struct Lock;
 
 template <typename T>
 struct shared_data{
@@ -19,7 +21,7 @@ struct shared_data{
 	T d;
 };
 
-#if defined (FP) || (ISPL) || (AFP) || (FPQ) || (SPL) || (BQ) || (VASVAR)
+#if defined (FP) || (ISPL) || (AFP) || (FPQ) || (SPL) || (BQ) || (VAS)
 template <typename T>
 struct func_struct
 {

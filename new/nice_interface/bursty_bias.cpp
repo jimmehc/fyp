@@ -3,6 +3,7 @@
 #include "../../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 
@@ -20,9 +21,9 @@ void dec(volatile shared_data<int> * sd, void* params = NULL){
 
 void switch_to_dom(volatile shared_data<int> * sd, void* params){
 	sd->l.owner = (long) params;
-	asm volatile ("mfence");
+	fence();
 	sd->l.biased_mode = true;
-	asm volatile ("mfence");
+	fence();
 	std::cout << "SWITCH" << sd->l.owner << std::endl;
 }
 
@@ -31,7 +32,7 @@ void FUCK_YOU(volatile shared_data<int> * sd, void * params = NULL){
 }
 void switch_to_unbiased(volatile shared_data<int> * sd, void* params = NULL){
 	sd->l.biased_mode = false;
-	asm volatile ("mfence");
+	fence();
 	sd->l.func =&FUCK_YOU;
 	std::cout << "SWITCHUN" << sd->l.owner << std::endl;
 }
@@ -40,7 +41,7 @@ void switch_to_unbiased(volatile shared_data<int> * sd, void* params = NULL){
 void foo(threaddata<int> * td)
 {
 	
-	for(volatile int j = 0; j < 100000000; j++){ asm volatile ("pause");}
+	for(volatile int j = 0; j < 100000000; j++){ pause();} restorepr(); 
 #ifdef SWITCH	
 	critical_section(td->threadid, &switch_to_dom, td->sd, (void*) td->threadid);
 #endif
@@ -50,11 +51,11 @@ void foo(threaddata<int> * td)
 		critical_section(td->threadid, &inc, td->sd);
 	}
 
-	asm volatile ("mfence");
+	fence();
 #ifdef SWITCH	
 	critical_section(td->threadid, &switch_to_unbiased, td->sd);
 #endif
-	for(volatile int j = 0; j < 100000000; j++){ asm volatile ("pause");}
+	for(volatile int j = 0; j < 100000000; j++){ pause();} restorepr(); 
 #ifdef SWITCH	
 	critical_section(td->threadid, &switch_to_dom, td->sd,(void*) td->threadid);
 #endif
@@ -76,7 +77,7 @@ void bar(threaddata<int> * td)
 	for(int i = 0; i < NUM_ITS/(NUM_THREADS - 1); i++)
 	{
 		critical_section(td->threadid, &dec, td->sd);
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { asm volatile ("pause");}
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { pause();} restorepr(); 
 	}
 
 	std::cout << "thread: " << td->threadid << std::endl;

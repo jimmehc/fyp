@@ -2,9 +2,10 @@
 #define ALGS
 
 #include <iostream>
+#include "volatile_functions.h"
 #include "biased_sync.h"
 #include "myspinlock.h"
-
+#include "../constants.h"
 #define atstart() 
 
 template <typename T>
@@ -68,7 +69,7 @@ void poll(shared_data<T> * sd, void * params){
 	{	
 		sd->l.func (sd,sd->l.params );
 		sd->l.func = NULL;
-		asm volatile("mfence");
+		fence();
 	}
 }
 #endif
@@ -78,14 +79,15 @@ template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid, shared_data<T> * mysd = NULL){
 	spinlock::lockN(sd->l.n);
 	sd->l.params = params;
-	asm volatile ("mfence");
+	fence();
 	sd->l.func = work;
 	while (sd->l.func != NULL){ 
-		asm volatile ("pause"); 
+		pause(); 
 #ifdef MULTIPLE 
 		poll(mysd, NULL); 
 #endif
 	}
+	restorepr();
 	spinlock::unlockN(sd->l.n);
 }
 #endif
@@ -95,13 +97,14 @@ template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params, int threadid, shared_data<T> * mysd = NULL){
 	spinlock::lockN(sd->l.n);
 	while (sd->l.func != NULL){ 
-	asm volatile ("pause"); 
+	pause(); 
 #ifdef MULTIPLE 
 		poll(mysd, NULL); 
 #endif
 	}
+	restorepr();
 	sd->l.params = params;
-	asm volatile ("mfence");
+	fence();
 	sd->l.func = work;
 	spinlock::unlockN (sd->l.n);
 }
@@ -135,7 +138,7 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	success = CAS(&sd->l.fs, NULL, &fss[threadid]);
 	while(!success)	
 	{
-		for (int i = 0; i < 400; i++) {asm volatile ("pause");}
+		for (int i = 0; i < 400; i++) {pause();} restorepr(); 
 		success = CAS(&sd->l.fs, NULL,&fss[threadid]);
 	}
 }
@@ -146,7 +149,7 @@ void poll(shared_data<T> * sd, void * params){
 	{	
 		sd->l.fs->func (sd,sd->l.fs->params );
 		sd->l.fs = NULL;
-		asm volatile("mfence");
+		fence();
 	}
 }
 
@@ -185,13 +188,13 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	func_struct<T> fs;
 	fs.func = work;
 	fs.params = params;
-	while(!sd->l.q->pushElement(&fs)) {asm volatile ("pause");}
+	while(!sd->l.q->pushElement(&fs)) {pause();} restorepr(); 
 	spinlock::unlockN(sd->l.n);
 }
 
 #endif
 
-#ifdef VASVAR
+#ifdef VAS
 template <typename T>
 struct Lock{
 	int owner;
@@ -210,7 +213,7 @@ Lock<T>::Lock(){
 }
 
 #undef atstart
-#define atstart() while(sd->l.grant){asm volatile ("pause");}
+#define atstart() while(sd->l.grant){pause();} restorepr(); 
 
 template <typename T>
 void poll(shared_data<T> * sd, void * params)
@@ -218,7 +221,7 @@ void poll(shared_data<T> * sd, void * params)
 	if(sd->l.request) 
 	{	
 		sd->l.request = false; 
-		asm volatile ("mfence");
+		fence();
 		sd->l.grant = true;
 	}
 }
@@ -230,10 +233,11 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 #ifdef MULTIPLE
 		poll(mysd, NULL);
 #endif
-		asm volatile ("pause"); 
+		pause(); 
 	}
+	restorepr();
 	work(sd, params);
-	asm volatile ("mfence"); 
+	fence(); 
 	sd->l.grant = false; 
 	spinlock::unlockN(sd->l.n);
 }
@@ -282,15 +286,16 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	fs.params = params;
 	fs.creatorid = threadid;
 	sd->l.done[threadid] = false;
-	asm volatile("mfence");
-	while(!sd->l.q->pushElement(&fs)) {asm volatile ("pause"); }
+	fence();
+	while(!sd->l.q->pushElement(&fs)) {pause();} restorepr();
 	spinlock::unlockN(sd->l.n);
 	while(!sd->l.done[threadid]) { 
 #ifdef MULTIPLE
 		poll(mysd, NULL); 
 #endif
-		asm volatile("pause"); 
+		pause(); 
 	}
+	restorepr();
 }
 
 #endif
@@ -322,7 +327,7 @@ void poll(shared_data<T> * sd, void * params){
 	{	
 		message_handler(sd->l.token, sd, sd->l.params);
 		sd->l.token = 0;
-		asm volatile("mfence");
+		fence();
 	}
 }
 #endif
@@ -332,14 +337,15 @@ template <typename T>
 void push_work(int msg, shared_data<T> * sd, void * params, int threadid, shared_data<T> * mysd = NULL){
 	spinlock::lockN(sd->l.n);
 	sd->l.params = params;
-	asm volatile ("mfence");
+	fence();
 	sd->l.token = msg;
 	while (sd->l.token != 0){ 
-		asm volatile ("pause"); 
+		pause(); 
 #ifdef MULTIPLE 
 		poll(mysd, NULL); 
 #endif
 	}
+	restorepr();
 	spinlock::unlockN(sd->l.n);
 }
 #endif
@@ -349,13 +355,14 @@ template <typename T>
 void push_work(int msg, shared_data<T> * sd, void * params, int threadid, shared_data<T> * mysd = NULL){
 	spinlock::lockN(sd->l.n);
 	while (sd->l.token != 0){ 
-	asm volatile ("pause"); 
+	pause(); 
 #ifdef MULTIPLE 
 		poll(mysd, NULL); 
 #endif
 	}
+	restorepr();
 	sd->l.params = params;
-	asm volatile ("mfence");
+	fence();
 	sd->l.token = msg;
 	spinlock::unlockN (sd->l.n);
 }
@@ -394,7 +401,7 @@ void push_work(int msg, shared_data<T> * sd, void * params, int threadid, shared
 	msg_struct<T> ms;
 	ms.msg = msg;
 	ms.params = params;
-	while(!sd->l.q->pushElement(&ms)) {asm volatile ("pause");}
+	while(!sd->l.q->pushElement(&ms)) {pause();} restorepr(); 
 	spinlock::unlockN(sd->l.n);
 }
 
@@ -428,7 +435,7 @@ void push_work(int msg, shared_data<T> * sd, void * params, int threadid, shared
 	success = CAS(&sd->l.ms, NULL, &mss[threadid]);
 	while(!success)	
 	{
-		for (int i = 0; i < 400; i++) {asm volatile ("pause");}
+		for (int i = 0; i < 400; i++) {pause();} restorepr(); 
 		success = CAS(&sd->l.ms, NULL, &mss[threadid]);
 	}
 }
@@ -439,7 +446,7 @@ void poll(shared_data<T> * sd, void * params){
 	{	
 		message_handler(sd->l.ms->msg, sd, sd->l.ms->params);
 		sd->l.ms = NULL;
-		asm volatile("mfence");
+		fence();
 	}
 }
 

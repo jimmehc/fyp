@@ -3,6 +3,7 @@
 #include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 volatile unsigned long long start;
@@ -14,10 +15,26 @@ void inc(shared_data<int> * sd, void * params = NULL){
 void foo(threaddata<int> * td)
 {
 	for(int i = 0; i < DOM_ACCESSES; i++)
+	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VAS)
 	{
 		for(volatile int j = 0; j < 1; j++);
 		critical_section(td->threadid, &inc, td->sd);
 	}
+	#elif defined SPL
+	{
+		for(volatile int j = 0; j < 1; j++);
+
+		spinlock::lockN(td->sd->l.n);
+		td->sd->d++;
+		spinlock::unlockN(td->sd->l.n);
+	}
+	#else
+	{
+		for(volatile int j = 0; j < 1; j++);
+		critical_section(td->threadid, 1, td->sd);
+	}
+	#endif
+
 }
 	
 
@@ -25,10 +42,26 @@ void bar(threaddata<int> * td)
 {
 	td->done = true;
 	for(;;)
+	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VAS)
 	{
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { asm volatile ("pause"); }
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { pause();} restorepr();
 		critical_section(td->threadid, &inc, td->sd);
 	}
+	#elif defined SPL
+	{
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { pause();} restorepr();
+
+		spinlock::lockN(td->sd->l.n);
+		td->sd->d++;
+		spinlock::unlockN(td->sd->l.n);
+	}
+	#else
+	{
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { pause();} restorepr();
+		critical_section(td->threadid, 1, td->sd);
+	}
+	#endif
+
 }	
 
 int main()
@@ -55,21 +88,7 @@ int main()
 	{
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) bar, (void *) &j[i] );
 	}
-#ifdef LOOP		
-	for(int i = 1; i < NUM_THREADS; i++)
-		pthread_join(threads[i], NULL);
-
-	j[0].done = true;
-	asm volatile ("mfence");
-	//std::cout << "done should now be true " << &j[0].done << std::endl;
-	pthread_join(threads[0], NULL);
-#else
 	pthread_join(threads[0], NULL);	//wait for dom thread
-
-	for(int i = 1; i < NUM_THREADS; i++)
-		if(!j[i].done)
-			std::cout << "Tipping point hit, non dom threads not complete, x: " << *x << std::endl;
-#endif
 
 	volatile unsigned long long end = get_time();
 

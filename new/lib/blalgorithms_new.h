@@ -35,7 +35,7 @@ void poll(shared_data<T> * sd, void * params){
 	{	
 		sd->l.fs.func (sd,sd->l.fs.params );
 		sd->l.fs.func = NULL;
-		asm volatile("mfence");
+		fence();
 	}
 }
 #endif
@@ -48,8 +48,8 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	fs.func = work;
 	fs.params = params;
 	sd->l.fs = fs;
-	asm volatile ("mfence");
-	while (sd->l.fs.func != NULL){ asm volatile ("pause"); }
+	fence();
+	while (sd->l.fs.func != NULL){ pause();} restorepr();
 	pthread_spin_unlock(sd->l.n);
 }
 #endif
@@ -58,12 +58,12 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params){
 	pthread_spin_lock(sd->l.n);
-	while (sd->l.fs.func != NULL){ asm volatile ("pause"); }
+	while (sd->l.fs.func != NULL){ pause();} restorepr();
 	func_struct<T> fs;
 	fs.func = work;
 	fs.params = params;
 	sd->l.fs = fs;
-	asm volatile ("mfence");
+	fence();
 	pthread_spin_unlock(sd->l.n);
 }
 
@@ -81,7 +81,7 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	int success = 0;
 	do
 	{
-		while (sd->l.fs != NULL) {asm volatile ("pause");}
+		while (sd->l.fs != NULL) {pause();} restorepr(); 
 		success = CAS(&sd->l.fs, NULL, &fs);
 	}while(!success);
 }
@@ -123,7 +123,7 @@ template <typename T>
 void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void * params){
 	pthread_spin_lock(sd->l.n);
 	sd->l.params = params;
-	while(!sd->l.q->pushElement(&work)) {asm volatile ("pause");}
+	while(!sd->l.q->pushElement(&work)) {pause();} restorepr(); 
 	pthread_spin_unlock(sd->l.n);
 }
 

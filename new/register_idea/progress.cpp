@@ -2,6 +2,7 @@
 #include "../../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 volatile unsigned long long start;
@@ -36,7 +37,7 @@ void bar(threaddata * td)
 		non_dom_crit_sec();
 
 		biased_unlock(lock);
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS - 1)); j++){ asm volatile ("pause");}
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS - 1)); j++){ pause();} restorepr(); 
 	}
 }	
 

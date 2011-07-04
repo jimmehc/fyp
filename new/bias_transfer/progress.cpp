@@ -2,6 +2,7 @@
 #include "../../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 volatile unsigned long long start;
@@ -11,7 +12,7 @@ void foo(threaddata * td)
 	volatile Lock * lock = td->lock;
 	for(long i = 0; i < DOM_ACCESSES; i++)
 	{
-		for(volatile int j = 0; j < 1; j++){/* asm volatile ("pause");*/}
+		for(volatile int j = 0; j < 1; j++){/* pause();*/}
 		biased_lock_owner(lock);
 
 		*(td->x) = (*td->x) + 1;
@@ -32,7 +33,7 @@ void bar(threaddata * td)
 		non_dom_crit_sec();
 
 		biased_unlock(lock);
-		for(volatile int j = 0; j < (NON_DOM_DELAY*(NUM_THREADS - 1)); j++){ asm volatile("pause");}
+		for(volatile int j = 0; j < (NON_DOM_DELAY*(NUM_THREADS - 1)); j++){ pause();} restorepr(); 
 	}
 	//std::cout << *contention << " contended lock accesses by non dom thread " << td->threadid << std::endl;
 }	

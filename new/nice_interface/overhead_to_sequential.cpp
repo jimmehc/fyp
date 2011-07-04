@@ -19,9 +19,6 @@ void incsd(shared_data<int> * sd, void* params = NULL){
 void foo(threaddata<int> * td)
 {
 
-	#ifdef SEQ
-//	int x = td->sd->d;
-	#endif
 	for(int i = 0; i < NUM_ITS; i++)
 	#if defined (SEQ)
 	{
@@ -31,7 +28,7 @@ void foo(threaddata<int> * td)
 	
 //		td->sd->d = x;
 		asm volatile ("mfence");
-	#elif defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VASVAR)
+	#elif defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VAS)
 		critical_section(td->threadid, &incsd, td->sd);
 	#elif defined SPL
 	{
@@ -41,7 +38,8 @@ void foo(threaddata<int> * td)
 		spinlock::unlockN(td->sd->l.n);
 	}
 	#else
-		critical_section(td->threadid, 1, td->sd);
+		for (int j = 0; j < CS_SIZE; j++)
+			critical_section(td->threadid, 1, td->sd);
 	#endif
 
 	std::cout << td->sd->d << std::endl;

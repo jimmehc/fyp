@@ -50,21 +50,21 @@ struct Lock {
 	lock->request = false; \
 	lock->grant = false;
 
-#define biased_lock_owner(lock) while(lock->grant){asm volatile ("pause");}
+#define biased_lock_owner(lock) while(lock->grant){pause();} restorepr(); 
 #define biased_unlock_owner(lock)	\
 	if(lock->request) \
 	{	\
 		lock->request = false; \
-		asm volatile ("mfence");\
+		fence();\
 		lock->grant = true;\
 	}
 
 #define biased_lock(lock) \
 	pthread_spin_lock(&(lock->n)); \
 	lock->request = true; \
-	while(!lock->grant){ asm volatile ("pause"); }
+	while(!lock->grant){ pause();} restorepr();
 #define biased_unlock(lock) \
-	asm volatile ("mfence"); \
+	fence(); \
 	lock->grant = false; \
 	pthread_spin_unlock(&(lock->n));
 
@@ -91,18 +91,18 @@ struct Lock {
 	{	\
 		*td->x = x;\
 		lock->request = false; \
-		asm volatile ("mfence");\
+		fence();\
 		lock->grant = true;\
-		while(lock->grant){asm volatile ("pause");}\
+		while(lock->grant){pause();} restorepr(); \
 		x = *td->x;\
 	}
 
 #define biased_lock(lock) \
 	pthread_spin_lock(&(lock->n)); \
 	lock->request = true; \
-	while(!lock->grant){ asm volatile ("pause"); }
+	while(!lock->grant){ pause();} restorepr();
 #define biased_unlock(lock) \
-	asm volatile ("mfence"); \
+	fence(); \
 	lock->grant = false; \
 	pthread_spin_unlock(&(lock->n));
 
@@ -130,7 +130,7 @@ struct Lock {
 	{	\
 		lock->func (&x, lock);				/*XXX: REVISIT*/\
 		lock->func = NULL;\
-		asm volatile("mfence");\
+		fence();\
 		lock->done = 1;\
 	}
 	
@@ -139,7 +139,7 @@ struct Lock {
 	lock->done = 0;
 
 #define biased_unlock(lock) \
-	while((!lock->done)){ asm volatile ("pause");}\
+	while((!lock->done)){ pause();} restorepr(); \
 	pthread_spin_unlock(&(lock->n));
 
 #define non_dom_crit_sec() \
@@ -170,15 +170,15 @@ struct Lock {
 	if(lock->func != NULL) 	\
 	{	\
 		lock->func (&x, lock);		/*XXX: REVISIT*/\
-		asm volatile("mfence");\
+		fence();\
 	}
 	
 #define biased_lock(lock) \
 	pthread_spin_lock(&(lock->n)); \
-	while(lock->func != NULL){ asm volatile ("pause");}
+	while(lock->func != NULL){ pause();} restorepr(); 
 
 #define biased_unlock(lock) \
-	asm volatile ("mfence"); \
+	fence(); \
 	pthread_spin_unlock(&(lock->n));
 
 #define non_dom_crit_sec() \
@@ -187,7 +187,7 @@ struct Lock {
 inline void incx (int * x, volatile Lock * l)
 {
 	l->func = NULL;
-	asm volatile ("mfence");
+	fence();
 	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
 	#endif	
@@ -218,7 +218,7 @@ struct Lock {
 				x = x + 1; \
 				lock->token = 0;\
 				lock->done = 1;\
-				asm volatile("mfence");\
+				fence();\
 				break;\
 		}\
 	}	
@@ -228,7 +228,7 @@ struct Lock {
 	lock->done = 0;
 
 #define biased_unlock(lock) \
-	while((!lock->done)){ asm volatile ("pause");}\
+	while((!lock->done)){ pause();} restorepr(); \
 	pthread_spin_unlock(&(lock->n));
 
 #define non_dom_crit_sec() \
@@ -261,10 +261,10 @@ struct Lock {
 	
 #define biased_lock(lock) \
 	pthread_spin_lock(&(lock->n)); \
-	while(lock->token != 0) { asm volatile ("pause"); }
+	while(lock->token != 0) { pause();} restorepr();
 
 #define biased_unlock(lock) \
-	asm volatile("mfence");\
+	fence();\
 	pthread_spin_unlock(&(lock->n));
 
 #define non_dom_crit_sec() \
@@ -286,7 +286,7 @@ inline void pushWork (volatile fp * lck, fp func)
 	int success = 0;
 	do
 	{
-		while (*lck != NULL) { asm volatile("pause"); }
+		while (*lck != NULL) { pause();} restorepr();
 		success = CAS(lck, NULL, func);
 	}while(!success);
 }
@@ -299,21 +299,21 @@ inline void pushWork (volatile fp * lck, fp func)
 	if(lock->func != NULL) 	\
 	{	\
 		lock->func (&x, lock);		/*XXX: REVISIT*/\
-		asm volatile("mfence");\
+		fence();\
 	}
 	
 #define biased_lock(lock) \
 	pushWork(&lock->func, &incy);
 
 #define biased_unlock(lock) \
-	asm volatile ("mfence"); 
+	fence(); 
 
 #define non_dom_crit_sec() 
 
 inline void incy (int * y, volatile Lock * l)
 {
 	l->func = NULL;
-	asm volatile ("mfence");
+	fence();
 	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
 	#endif	
@@ -334,7 +334,7 @@ inline void pushWork (volatile int * lck, int token)
 	int success = 0;
 	do
 	{
-		while (*lck != 0) { asm volatile ("pause");}
+		while (*lck != 0) { pause();} restorepr(); 
 		success = CAS(lck, 0, token);
 	}while(!success);
 }
@@ -347,7 +347,7 @@ inline void pushWork (volatile int * lck, int token)
 
 	while(!success)
 	{
-		for(int i = 0; i < SPIN_COUNT; i++) { asm volatile("pause"); }
+		for(int i = 0; i < SPIN_COUNT; i++) { pause();} restorepr();
 		success = CAS(lck, 0, token);
 	}
 }*/
@@ -363,7 +363,7 @@ inline void pushWork (volatile int * lck, int token)
 		{ 			\
 			case 1: \
 				lock->token = 0;\
-				asm volatile("mfence");\
+				fence();\
 				x = x + 1; \
 				break;\
 		}\
@@ -373,7 +373,7 @@ inline void pushWork (volatile int * lck, int token)
 	pushWork(&lock->token, 1);
 
 #define biased_unlock(lock) \
-	asm volatile ("mfence"); 
+	fence(); 
 
 #define non_dom_crit_sec() 
 
@@ -418,14 +418,15 @@ void (*func)(int * x, volatile Lock * l);
 	pthread_spin_lock(&(lock->n)); 
 
 #define biased_unlock(lock) \
-	asm volatile ("mfence");\
+	fence();\
 	pthread_spin_unlock(&(lock->n));
 
 #define non_dom_crit_sec() \
 	func = &incx;	\
-	while(!lock->q->pushElement(&func)) {asm volatile ("pause");}
+	while(!lock->q->pushElement(&func)) {pause();} restorepr(); 
 
 #include <iostream>
+#include "../lib/volatile_functions.h"
 
 inline void incx (int * x, volatile Lock * l)
 {
@@ -466,7 +467,7 @@ int el;
 					{\
 						case 1:\
 							x = x + 1;\
-							asm volatile("mfence");\
+							fence();\
 							break;\
 					}
 
@@ -474,12 +475,12 @@ int el;
 	pthread_spin_lock(&(lock->n)); 
 
 #define biased_unlock(lock) \
-	asm volatile ("mfence");\
+	fence();\
 	pthread_spin_unlock(&(lock->n));
 
 #define non_dom_crit_sec() \
 	el = 1;	\
-	while(!q->pushElement(&el)) {asm volatile ("pause");}
+	while(!q->pushElement(&el)) {pause();} restorepr(); 
 
 #endif
 
@@ -517,7 +518,7 @@ inline void pushWork (volatile fp * lck, fp func)
 	{	\
 		lock->func (&x, lock);		/*XXX: REVISIT*/\
 		lock->done = true;\
-		asm volatile("mfence");\
+		fence();\
 	}
 	
 #define biased_lock(lock) \
@@ -527,16 +528,16 @@ inline void pushWork (volatile fp * lck, fp func)
 //	pushWork(&lock->func, &incy);	
 
 #define biased_unlock(lock) \
-	while(!lock->done){ asm volatile ("pause"); }\
+	while(!lock->done){ pause();} restorepr();\
 	pthread_spin_unlock(&(lock->n));\
-	asm volatile ("mfence"); 
+	fence(); 
 
 #define non_dom_crit_sec() 
 
 inline void incy (int * y, volatile Lock * l)
 {
 	l->func = NULL;
-	asm volatile ("mfence");
+	fence();
 	#if DELAY
 	for(int j = 0; j < DELAY; j++) ;
 	#endif	
@@ -574,7 +575,7 @@ void (*func)(int * x, volatile Lock * l);
 #define biased_lock(lock)
 
 #define biased_unlock(lock) \
-	asm volatile ("mfence");
+	fence();
 
 #define non_dom_crit_sec() \
 	func = &incx;	\

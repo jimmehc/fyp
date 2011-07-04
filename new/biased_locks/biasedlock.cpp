@@ -2,6 +2,7 @@
 #include "../../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 
 volatile unsigned long long start;
@@ -30,7 +31,7 @@ void foo(threaddata * td)
 #ifdef LOOP
 		while(!td->done)
 		{
-			asm volatile ("pause");
+			pause();
 			biased_unlock_owner(lock);
 		}
 #endif
@@ -86,7 +87,7 @@ int main()
 		pthread_join(threads[i], NULL);
 
 	j[0].done = true;
-	asm volatile ("mfence");
+	fence();
 	//std::cout << "done should now be true " << &j[0].done << std::endl;
 	pthread_join(threads[0], NULL);
 #else

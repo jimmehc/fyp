@@ -3,6 +3,7 @@
 #include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
+#include "../lib/volatile_functions.h"
 #include <pthread.h>
 #include <cstdlib>
 
@@ -14,34 +15,31 @@ void inc(shared_data<int> * sd, void * params = NULL){
 	sd->d++;
 }
 
-void getRand(shared_data<int> * sd, void * params = NULL){
-	sd->d = rand();
-}
-
 void foo(threaddata<int> * td)
 {
-	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VASVAR)
+	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VAS)
 	for(int i = 0; i < DOM_ACCESSES; i++)
-		critical_section(td->threadid, &getRand, td->sd);
+		critical_section(td->threadid, &inc, td->sd);
 	#elif defined SPL
 	for(int i = 0; i < DOM_ACCESSES; i++)
 	{
 		spinlock::lockN(td->sd->l.n);
-		td->sd->d = rand();
+		td->sd->d++;
 		spinlock::unlockN(td->sd->l.n);
 	}
 	#else
 	for(int i = 0; i < DOM_ACCESSES; i++)
-		critical_section(td->threadid, 3, td->sd);
+		critical_section(td->threadid, 1, td->sd);
 	#endif
 
 #ifndef SPL
 #ifdef LOOP
 	while(!td->done)
 	{
-		asm volatile ("pause");
+		pause();
 		poll(td->sd, NULL);
 	}
+	restorepr();
 	std::cout << "done" << std::endl;
 #endif
 #endif
@@ -50,7 +48,7 @@ void foo(threaddata<int> * td)
 
 void bar(threaddata<int> * td)
 {
-	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VASVAR)
+	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VAS)
 	for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		critical_section(td->threadid, &inc, td->sd);
 	#elif defined SPL
@@ -95,7 +93,7 @@ int main()
 		pthread_join(threads[i], NULL);
 
 	j[0].done = true;
-	asm volatile ("mfence");
+	fence();
 	std::cout << "done should now be true " << &j[0].done << std::endl;
 	pthread_join(threads[0], NULL);
 #else
