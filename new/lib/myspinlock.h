@@ -7,7 +7,7 @@
 #define SPIN_COUNT 400 
 namespace spinlock
 {
-/*inline void lockN (volatile int * lck)
+inline void lockN (volatile int * lck)
 {
 	int success = 0;
 	success = CAS(lck, 0, 1);
@@ -16,7 +16,7 @@ namespace spinlock
 		for (int i =0; i < SPIN_COUNT; i++) { asm volatile("pause"); }
 		success = CAS(lck, 0, 1);
 	}
-}*/
+}/*
 inline void lockN (volatile int * lck, int * contention)
 {
 	int success = 0;
@@ -30,10 +30,11 @@ inline void lockN (volatile int * lck, int * contention)
 			success = CAS(lck, 0, 1);
 		}while(!success);
 	}
-}
+}*/
 
 inline void unlockN (volatile int * lck)
 {
+//	asm volatile ("mfence");
 	*lck = 0;
 }
 }

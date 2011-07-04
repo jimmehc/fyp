@@ -6,55 +6,77 @@
 #include <pthread.h>
 
 
-#define NUM_ITS 100000000
+#define NUM_ITS 1000000
 
 volatile unsigned long long start;
 
-void inc(shared_data<int> * sd, void* params = NULL){
+void inc(volatile shared_data<int> * sd, void* params = NULL){
 	sd->d++;
 }
 
-void switch_to_dom(shared_data<int> * sd, void* params){
-	sd->l.biased_mode = true;
+void dec(volatile shared_data<int> * sd, void* params = NULL){
+	sd->d--;
+}
+
+void switch_to_dom(volatile shared_data<int> * sd, void* params){
 	sd->l.owner = (long) params;
+	asm volatile ("mfence");
+	sd->l.biased_mode = true;
+	asm volatile ("mfence");
 	std::cout << "SWITCH" << sd->l.owner << std::endl;
 }
 
-void switch_to_unbiased(shared_data<int> * sd, void* params = NULL){
-	sd->l.biased_mode = false;
+void FUCK_YOU(volatile shared_data<int> * sd, void * params = NULL){
+	std::cout << "FUCK YOU" << std::endl;
 }
+void switch_to_unbiased(volatile shared_data<int> * sd, void* params = NULL){
+	sd->l.biased_mode = false;
+	asm volatile ("mfence");
+	sd->l.func =&FUCK_YOU;
+	std::cout << "SWITCHUN" << sd->l.owner << std::endl;
+}
+
 
 void foo(threaddata<int> * td)
 {
 	
-	usleep(5);
+	for(volatile int j = 0; j < 100000000; j++){ asm volatile ("pause");}
 #ifdef SWITCH	
 	critical_section(td->threadid, &switch_to_dom, td->sd, (void*) td->threadid);
 #endif
 	for(int i = 0; i < NUM_ITS; i++)
+	{
+		for(volatile int j = 0; j < 1; j++);	
 		critical_section(td->threadid, &inc, td->sd);
+	}
 
 	asm volatile ("mfence");
 #ifdef SWITCH	
 	critical_section(td->threadid, &switch_to_unbiased, td->sd);
 #endif
-	usleep(5);
+	for(volatile int j = 0; j < 100000000; j++){ asm volatile ("pause");}
 #ifdef SWITCH	
-//	critical_section(td->threadid, &switch_to_dom, td->sd,(void*) td->threadid);
+	critical_section(td->threadid, &switch_to_dom, td->sd,(void*) td->threadid);
 #endif
 	for(int i = 0; i < NUM_ITS; i++)
+	{
+		for(volatile int j = 0; j < 1; j++);	
 		critical_section(td->threadid, &inc, td->sd);
+	}
 #ifdef SWITCH	
-//	critical_section(td->threadid, &switch_to_unbiased, td->sd);
+	critical_section(td->threadid, &switch_to_unbiased, td->sd);
+#else
+	for(;;){ poll(td->sd, NULL); }
 #endif
+	std::cout << "thread: " << td->threadid << std::endl;
 }
 
 void bar(threaddata<int> * td)
 {
-	for(;;)
+	for(int i = 0; i < NUM_ITS/(NUM_THREADS - 1); i++)
 	{
-		usleep(1);
-		critical_section(td->threadid, &inc, td->sd);
+		critical_section(td->threadid, &dec, td->sd);
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { asm volatile ("pause");}
 	}
 
 	std::cout << "thread: " << td->threadid << std::endl;
@@ -68,11 +90,11 @@ int main()
 	threaddata<int> j[NUM_THREADS];
 	int * x = new int(0);
 
-	shared_data<int> * sd = new shared_data<int>;
-
+	volatile shared_data<int> * sd = new shared_data<int>;
+#ifdef SWITCH
 	sd->l.owner = 1;
 	sd->l.biased_mode = false;
-
+#endif
 	for(int i = 0; i < NUM_THREADS; i++)
 	{
 		j[i].sd = sd;
@@ -84,10 +106,11 @@ int main()
 
 	pthread_create(&threads[0], NULL, (void* (*)(void*)) foo, (void *) &j[0] );
 
-	for(int i = 1; i < NUM_THREADS; i++)
+	for(int i = 0; i < NUM_THREADS; i++)
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) bar, (void *) &j[i] );
 
-	pthread_join(threads[0], NULL);	//wait for dom thread
+	for(int i = 0; i < NUM_THREADS; i++)
+		pthread_join(threads[i], NULL);	//wait for dom thread
 
 	volatile unsigned long long end = get_time();
 

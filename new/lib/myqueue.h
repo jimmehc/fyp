@@ -11,14 +11,14 @@ class myqueue
 	volatile int m_Write;
 	static const int Size = 10;
 	volatile T m_Data[Size];
-	bool popElement(T * Element) volatile;
-	bool pushElement(T * Element) volatile;
+	bool popElement(T * Element) ;
+	bool pushElement(T * Element) ;
 	volatile int padding[64];
 	volatile int m_Read;
 };
 
 template <class T>
-bool myqueue<T>::popElement(T * Element) volatile
+bool myqueue<T>::popElement(T * Element) 
 {
 //	std::cout << "HI" << std::endl;
         if(m_Read == m_Write)
@@ -32,7 +32,7 @@ bool myqueue<T>::popElement(T * Element) volatile
 }
 
 template <class T>
-bool myqueue<T>::pushElement(T * Element) volatile
+bool myqueue<T>::pushElement(T * Element) 
 {
         int nextElement = (m_Write + 1) % Size;
         if(nextElement != m_Read)

@@ -1,9 +1,12 @@
 #include "biasedlock.h"
 #include "../lib/biased_sync.h"
-#include "../../lib/timing.h"
+#include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
 #include <pthread.h>
+#include <cstdlib>
+
+#include "../lib/myspinlock.h"
 
 volatile unsigned long long start;
 
@@ -11,18 +14,28 @@ void inc(shared_data<int> * sd, void * params = NULL){
 	sd->d++;
 }
 
-void switch_to_unbiased(shared_data<int> * sd, void * params = NULL)
-{
-	std::cout << "SWITCH" << std::endl;
-	sd->l.biased_mode = false;
+void getRand(shared_data<int> * sd, void * params = NULL){
+	sd->d = rand();
 }
 
 void foo(threaddata<int> * td)
 {
+	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VASVAR)
 	for(int i = 0; i < DOM_ACCESSES; i++)
-		critical_section_owner(td->threadid, &inc, td->sd);
-	
-	//critical_section_owner(td->threadid, &switch_to_unbiased, td->sd);
+		critical_section(td->threadid, &getRand, td->sd);
+	#elif defined SPL
+	for(int i = 0; i < DOM_ACCESSES; i++)
+	{
+		spinlock::lockN(td->sd->l.n);
+		td->sd->d = rand();
+		spinlock::unlockN(td->sd->l.n);
+	}
+	#else
+	for(int i = 0; i < DOM_ACCESSES; i++)
+		critical_section(td->threadid, 3, td->sd);
+	#endif
+
+#ifndef SPL
 #ifdef LOOP
 	while(!td->done)
 	{
@@ -31,13 +44,26 @@ void foo(threaddata<int> * td)
 	}
 	std::cout << "done" << std::endl;
 #endif
+#endif
 }
 	
 
 void bar(threaddata<int> * td)
 {
+	#if defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VASVAR)
 	for(int i = 0; i < NON_DOM_ACCESSES; i++)
 		critical_section(td->threadid, &inc, td->sd);
+	#elif defined SPL
+	for(int i = 0; i < NON_DOM_ACCESSES; i++)
+	{
+		spinlock::lockN(td->sd->l.n);
+		td->sd->d++;
+		spinlock::unlockN(td->sd->l.n);
+	}
+	#else
+	for(int i = 0; i < NON_DOM_ACCESSES; i++)
+		critical_section(td->threadid, 1, td->sd);
+	#endif
 
 	td->done = true;
 }	

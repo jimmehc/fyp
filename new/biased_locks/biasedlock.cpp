@@ -15,9 +15,9 @@ void foo(threaddata * td)
 		{
 			biased_lock_owner(lock);
 
-			#if DELAY
-			for(int j = 0; j < DELAY; j++) ;
-			#endif	
+////			#if DELAY
+//			for(int j = 0; j < DELAY; j++) ;
+//			#endif	
 	
 			*(td->x) = (*td->x) + 1;
 		
@@ -43,9 +43,9 @@ void foo(threaddata * td)
 		{
 			biased_lock(lock);
 
-			#if DELAY
-			for(int j = 0; j < DELAY; j++) ;
-			#endif	
+//			#if DELAY
+//			for(int j = 0; j < DELAY; j++) ;
+//			#endif	
 
 			non_dom_crit_sec();
 
@@ -77,7 +77,6 @@ int main()
 		j[i].lock = lck;
 		j[i].threadid = new int(i);
 		j[i].done = false;
-		j[i].contention = new int(0);
 		for(volatile int k = 0; k < 1000; k++);
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) &j[i] );
 	}	
@@ -100,14 +99,8 @@ int main()
 
 	volatile unsigned long long end = get_time();
 
-	int totalcontention = 0;
-	for(int i = 1; i < NUM_THREADS; i++)
-		totalcontention += *(j[i].contention);
-
 	std::cout << "time: " << end-start << std::endl;
 
-	std::cout << "contended lock accesses by non doms: " << totalcontention << std::endl;
-	std::cout << (double)(totalcontention*100)/(double)(NON_DOM_ACCESSES*(NUM_THREADS-1)) << "%" << std::endl;
 
 	std::cout << "x: " << *x << std::endl;
 }

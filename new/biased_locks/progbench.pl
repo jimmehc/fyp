@@ -224,10 +224,10 @@ sub output_dom_acc_graph_file
 			case "100" { print FILE "99"; }
 			case "25" { print FILE "96"; }
 			case "10" { print FILE "90"; }
-			case "" { print FILE "85"; }
-			case "5" { print FILE "80"; }
-			case "SF" { print FILE "75"; }
-			case "S" { print FILE "70"; }
+			case "5" { print FILE "85"; }
+			case "4" { print FILE "80"; }
+			case "3" { print FILE "75"; }
+			case "2" { print FILE "66"; }
 		}
 		print FILE " ";
 		foreach $algorithm (@all_algorithms)

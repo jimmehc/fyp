@@ -1,6 +1,6 @@
 #include "progress.h"
 #include "../lib/biased_sync.h"
-#include "../../lib/timing.h"
+#include "../lib/timing.h"
 #include "../constants.h"
 #include <iostream>
 #include <pthread.h>
@@ -16,7 +16,7 @@ void foo(threaddata<int> * td)
 	for(int i = 0; i < DOM_ACCESSES; i++)
 	{
 		for(volatile int j = 0; j < 1; j++);
-		critical_section_owner(td->threadid, &inc, td->sd);
+		critical_section(td->threadid, &inc, td->sd);
 	}
 }
 	
@@ -26,7 +26,7 @@ void bar(threaddata<int> * td)
 	td->done = true;
 	for(;;)
 	{
-		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++);
+		for(volatile int j = 0; j < (NDD*(NUM_THREADS-1)); j++) { asm volatile ("pause"); }
 		critical_section(td->threadid, &inc, td->sd);
 	}
 }	
@@ -53,7 +53,6 @@ int main()
 
 	for(int i = 1; i < NUM_THREADS; i++)
 	{
-		for(volatile int k = 0; k < (30*(NUM_THREADS-1)); k++);
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) bar, (void *) &j[i] );
 	}
 #ifdef LOOP		

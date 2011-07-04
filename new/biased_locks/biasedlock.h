@@ -10,7 +10,6 @@ struct threaddata
 {
 	//private
 	volatile int *threadid;
-	int * contention;
 
 	//shared
 	volatile Lock *lock;
@@ -43,11 +42,11 @@ struct Lock {
 #define lock_init(lock) \
 	lock->n = 0;
 
-#define biased_lock_owner(lock) spinlock::lockN(&lock->n, td->contention);
+#define biased_lock_owner(lock) spinlock::lockN(&lock->n);
 
 #define biased_unlock_owner(lock) spinlock::unlockN(&lock->n);	
 
-#define biased_lock(lock) spinlock::lockN(&lock->n, td->contention);
+#define biased_lock(lock) spinlock::lockN(&lock->n);
 #define biased_unlock(lock)	spinlock::unlockN(&(lock->n));
 
 #define non_dom_crit_sec() \
@@ -101,7 +100,7 @@ struct Lock {
 	}
 
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	lock->request = true; \
 	while(!lock->grant){ asm volatile ("pause"); }
 #define biased_unlock(lock) \
@@ -137,7 +136,7 @@ struct Lock {
 	}
 
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	lock->request = true; \
 	while(!lock->grant){ asm volatile ("pause"); }
 #define biased_unlock(lock) \
@@ -174,7 +173,7 @@ struct Lock {
 	}
 	
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	lock->done = 0;
 
 #define biased_unlock(lock) \
@@ -218,7 +217,7 @@ struct Lock {
 	}
 	
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	lock->done = 0;
 
 #define biased_unlock(lock) \
@@ -253,7 +252,7 @@ struct Lock {
 	}
 	
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	lock->done = 0;
 
 #define biased_unlock(lock) \
@@ -292,7 +291,7 @@ struct Lock {
 	}
 	
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	while(lock->func != NULL){ asm volatile ("pause");}
 
 #define biased_unlock(lock) \
@@ -342,7 +341,7 @@ struct Lock {
 	}	
 	
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	lock->done = 0;
 
 #define biased_unlock(lock) \
@@ -378,7 +377,7 @@ struct Lock {
 	}	
 	
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); \
+	spinlock::lockN(&lock->n); \
 	while(lock->token != 0) { asm volatile ("pause"); }
 
 #define biased_unlock(lock) \
@@ -512,7 +511,7 @@ void (*func)(volatile long * y, volatile Lock * l);
 		while(lock->q->popElement(&func)) func (td->x, lock);	/*XXX: REVISIT*/
 	
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); 
+	spinlock::lockN(&lock->n); 
 
 #define biased_unlock(lock) \
 	asm volatile ("mfence");\
@@ -559,7 +558,7 @@ int el;
 					}
 
 #define biased_lock(lock) \
-	spinlock::lockN(&lock->n, td->contention); 
+	spinlock::lockN(&lock->n); 
 
 #define biased_unlock(lock) \
 	asm volatile ("mfence");\

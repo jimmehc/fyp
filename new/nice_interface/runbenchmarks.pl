@@ -4,12 +4,13 @@ use Switch;
 use Getopt::Std;
 
 #filename,delay,long,execute,process,rawout,graphout
-&getopts("f:d:lxprgi:");
+&getopts("f:d:lxprgi:b:");
 
 #my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
 #my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "QFP", "MPQ", "FPR", "AFPR", "MPR", "AMPR","ISPLR", "ISPLMPR", "QFPR", "MPQR");
-my @all_algorithms = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
-my @algorithms_to_run = ("SPL", "VAS", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "QFP", "MPQ");
+my @all_algorithms = ("SPL", "VAS", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "FPQ", "MPQ");
+my @algorithms_to_run = ("SPL", "VASVAR", "FP", "AFP", "MP", "AMP", "ISPL", "ISPLMP", "FPQ", "MPQ");
+#my @algorithms_to_run = ("SPL");
 my @options;
 my %arr;
 
@@ -20,7 +21,13 @@ if($opt_l)
 }
 else
 {
-	@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NE", "NS", "NSI", "NF", "NFO", "NT", "NTW", "NO", "N");
+	if($opt_b eq "multiple"){
+		@options = ("100000", "10000", "1000", "100", "50", "25", "10", "9", "8", "7", "6", "5");
+	}
+	else
+	{
+		@options = ("NNPNNN", "NNPNN", "NNPN", "NN", "NE", "NS", "NSI", "NF", "NFO", "NT", "NTW", "NO", "N");
+	}
 }
 
 if($opt_d)
@@ -36,7 +43,7 @@ $machinename = `hostname -s`;
 $num = `ls -l results|wc -l` + 1;
 chomp($machinename);
 
-$filename = $machinename."_delay".$delay."_".$num;
+$filename = $opt_b."_".$machinename."_delay".$delay."_".$num;
 
 print $filename;
 print "\n";
@@ -124,12 +131,19 @@ sub run_tests
 			
 			}
 			print "\n";
-			print `make ALG=$algorithm DOM=$option TP=LOOP`;
-		
+			
+			if($opt_b eq "multiple")
+			{
+				print `g++ -o $opt_b $opt_b.cpp -D$algorithm -DLOOP -DMULTIPLE -O3 -DNDF=$option -lpthread`;
+			}
+			else
+			{
+				print `g++ -o $opt_b $opt_b.cpp -D$algorithm -DLOOP -O3 -D$option -lpthread`;
+			}
 			my @res;
 			for($i = 0; $i < $opt_i; $i++)
 			{
-				$output = `./asymmetric`;
+				$output = `./$opt_b`;
 				$output =~ m/time: (.*)/;
 				$res[$i] = $1;
 				print $output;
@@ -192,7 +206,7 @@ sub output_graph_file
 			case "AMP" { print FILE "Asynchronous Message Passing;"; }
 			case "ISPL" { print FILE "Integrated Spinlock;"; }
 			case "ISPLMP" { print FILE "Integrated Message Passing Spinlock;"; }
-			case "QFP" { print FILE "Queue of Function Pointers;"; }
+			case "FPQ" { print FILE "Queue of Function Pointers;"; }
 			case "MPQ" { print FILE "Queue of Messages;"; }
 			case "FPR" { print FILE "Function Pointer Passing (Register);"; }
 			case "AFPR" { print FILE "Asynchronous Function Pointer Passing (Register);"; }
@@ -205,7 +219,7 @@ sub output_graph_file
 		}
 	}
 
-	print FILE "\n=table\nyformat=%gx\n=norotate\nylabel=Speedup\nxlabel=Dominance Percentage\n\n"; 
+	print FILE "\n=table\nyformat=%gx\n=norotate\nylabel=Speedup\nxlabel=Non Dom Access Period\n"; 
 
 
 	print FILE "#";
@@ -219,27 +233,7 @@ sub output_graph_file
 
 	foreach $option (@options)
 	{
-		switch($option)
-		{
-			case "NNPNNN" { print FILE "99.999"; }
-			case "NNPNN" { print FILE "99.99"; }
-			case "NNPN" { print FILE "99.9"; }
-			case "NN" { print FILE "99"; }
-			case "NE" { print FILE "98"; }
-			case "NS" { print FILE "97"; }
-			case "NSI" { print FILE "96"; }
-			case "NF" { print FILE "95"; }
-			case "NFO" { print FILE "94"; }
-			case "NT" { print FILE "93"; }
-			case "NTW" { print FILE "92"; }
-			case "NO" { print FILE "91"; }
-			case "N" { print FILE "90"; }
-			case "EF" { print FILE "85"; }
-			case "E" { print FILE "80"; }
-			case "SF" { print FILE "75"; }
-			case "S" { print FILE "70"; }
-		}
-		print FILE " ";
+		print FILE "$option ";
 		foreach $algorithm (@all_algorithms)
 		{
 #		if($algorithm ne "control")
