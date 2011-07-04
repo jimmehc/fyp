@@ -13,7 +13,7 @@ volatile unsigned long long start;
 
 void incsd(shared_data<int> * sd, void* params = NULL){
 	for (int j = 0; j < CS_SIZE; j++)
-		vol_inc(sd->d);
+		sd->d++;
 }
 
 void foo(threaddata<int> * td)
@@ -23,11 +23,12 @@ void foo(threaddata<int> * td)
 	#if defined (SEQ)
 	{
 		for (int j = 0; j < CS_SIZE; j++)
-			vol_inc(td->sd->d);
+			td->sd->d++;
+
 	}	
 	
 //		td->sd->d = x;
-		asm volatile ("mfence");
+		fence();
 	#elif defined (FP) || (AFP) || (ISPL) || (FPQ) || (BQ) || (VAS)
 		critical_section(td->threadid, &incsd, td->sd);
 	#elif defined SPL
