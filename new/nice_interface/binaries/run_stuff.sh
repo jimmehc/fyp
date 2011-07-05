@@ -9,45 +9,45 @@ algs=(SPL VAS FP AFP MP AMP ISPL ISPLMP FPQ MPQ BQ)
 
 cd ..
 
-#echo 'biasedlock'
-#echo '--------------------'
-#echo ''
-#for i in ${!domarr[*]};do
-#	echo ${domarr[i]}
-#	for j in ${!algs[*]}; do
-#		echo ${algs[j]}
-#		echo `./binaries/biasedlock/$i\_$j`;
-#	done
-#done
+echo 'biasedlock'
+echo '--------------------'
+echo ''
+for i in ${!domarr[*]};do
+	echo ${domarr[i]}
+	for j in ${!algs[*]}; do
+		echo ${algs[j]}
+		echo `./binaries/biasedlock/$i\_$j`;
+	done
+done
 
-#echo '---------------------------------------------------------------'
+echo '---------------------------------------------------------------'
 
 
-#echo 'multiple'
-#echo '--------------------'
-#echo ''
-#for i in ${!ndfarr[*]};do
-#	echo ${ndfarr[i]}
-#	for j in ${!algs[*]}; do
-#		echo ${algs[j]}
-#		echo `./binaries/multiple/$i\_$j`;
-#	done
-#done
+echo 'multiple'
+echo '--------------------'
+echo ''
+for i in ${!ndfarr[*]};do
+	echo ${ndfarr[i]}
+	for j in ${!algs[*]}; do
+		echo ${algs[j]}
+		echo `./binaries/multiple/$i\_$j`;
+	done
+done
 
-#echo '---------------------------------------------------------------'
+echo '---------------------------------------------------------------'
 
-#echo 'progress'
-#echo '--------------------'
-#echo ''
-#for i in ${!nddarr[*]};do
-#	echo ${nddarr[i]}
-#	for j in ${!algs[*]}; do
-#		echo ${algs[j]}
-#		echo `./binaries/progress/$i\_$j`;
-#	done
-#done
+echo 'progress'
+echo '--------------------'
+echo ''
+for i in ${!nddarr[*]};do
+	echo ${nddarr[i]}
+	for j in ${!algs[*]}; do
+		echo ${algs[j]}
+		echo `./binaries/progress/$i\_$j`;
+	done
+done
 
-#echo '---------------------------------------------------------------'
+echo '---------------------------------------------------------------'
 
 echo 'overhead_to_sequential'
 echo '--------------------'

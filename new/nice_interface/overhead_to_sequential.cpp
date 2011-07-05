@@ -35,7 +35,7 @@ void foo(threaddata<int> * td)
 	{
 		spinlock::lockN(td->sd->l.n);
 		for (int j = 0; j < CS_SIZE; j++)
-			vol_inc(td->sd->d);
+			td->sd->d++;
 		spinlock::unlockN(td->sd->l.n);
 	}
 	#else
