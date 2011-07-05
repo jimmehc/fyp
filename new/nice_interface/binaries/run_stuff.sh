@@ -9,19 +9,16 @@ algs=(SPL VAS FP AFP MP AMP ISPL ISPLMP FPQ MPQ BQ)
 
 cd ..
 
-echo 'biasedlock'
+echo 'progress'
 echo '--------------------'
 echo ''
-for i in ${!domarr[*]};do
-	echo ${domarr[i]}
+for i in ${!nddarr[*]};do
+	echo ${nddarr[i]}
 	for j in ${!algs[*]}; do
 		echo ${algs[j]}
-		echo `./binaries/biasedlock/$i\_$j`;
+		echo `./binaries/progress/$i\_$j`;
 	done
 done
-
-echo '---------------------------------------------------------------'
-
 
 echo 'multiple'
 echo '--------------------'
@@ -36,14 +33,16 @@ done
 
 echo '---------------------------------------------------------------'
 
-echo 'progress'
+echo '---------------------------------------------------------------'
+
+echo 'biasedlock'
 echo '--------------------'
 echo ''
-for i in ${!nddarr[*]};do
-	echo ${nddarr[i]}
+for i in ${!domarr[*]};do
+	echo ${domarr[i]}
 	for j in ${!algs[*]}; do
 		echo ${algs[j]}
-		echo `./binaries/progress/$i\_$j`;
+		echo `./binaries/biasedlock/$i\_$j`;
 	done
 done
 
