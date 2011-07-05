@@ -40,7 +40,6 @@ void foo(threaddata<int> * td)
 		poll(td->sd, NULL);
 	}
 	restorepr();
-	std::cout << "done" << std::endl;
 #endif
 #endif
 }
@@ -94,7 +93,6 @@ int main()
 
 	j[0].done = true;
 	fence();
-	std::cout << "done should now be true " << &j[0].done << std::endl;
 	pthread_join(threads[0], NULL);
 #else
 //	pthread_join(threads[0], NULL);	//wait for dom thread
