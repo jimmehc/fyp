@@ -6,7 +6,7 @@
 #include "../lib/volatile_functions.h"
 #include <pthread.h>
 
-#define NUM_ITS 100000000
+#define NUM_ITS 10000000
 #ifndef NDF
 #define NDF 10000
 #endif
