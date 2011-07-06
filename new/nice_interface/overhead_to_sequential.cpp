@@ -7,7 +7,7 @@
 #include <pthread.h>
 #include <cstdlib>
 
-#define NUM_ITS 10000000
+#define NUM_ITS 1000000
 
 volatile unsigned long long start;
 
