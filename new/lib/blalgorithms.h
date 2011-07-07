@@ -138,7 +138,13 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	success = CAS(&sd->l.fs, NULL, &fss[threadid]);
 	while(!success)	
 	{
-		for (int i = 0; i < 400; i++) {pause();} restorepr(); 
+		for (int i = 0; i < 400; i++) {
+#ifdef MULTIPLE
+			poll(mysd, NULL); 
+#endif
+			pause();
+		} 
+		restorepr(); 
 		success = CAS(&sd->l.fs, NULL,&fss[threadid]);
 	}
 }
@@ -188,7 +194,12 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	func_struct<T> fs;
 	fs.func = work;
 	fs.params = params;
-	while(!sd->l.q->pushElement(&fs)) {pause();} restorepr(); 
+	while(!sd->l.q->pushElement(&fs)) {
+#ifdef MULTIPLE	
+		poll(mysd, NULL);
+#endif
+		pause();
+	} restorepr(); 
 	spinlock::unlockN(sd->l.n);
 }
 
@@ -287,7 +298,12 @@ void push_work(void (*work)(shared_data<T> *, void *), shared_data<T> * sd, void
 	fs.creatorid = threadid;
 	sd->l.done[threadid] = false;
 	fence();
-	while(!sd->l.q->pushElement(&fs)) {pause();} restorepr();
+	while(!sd->l.q->pushElement(&fs)) {
+#ifdef MULTIPLE
+		poll(mysd, NULL); 
+#endif
+		pause();
+	} restorepr();
 	spinlock::unlockN(sd->l.n);
 	while(!sd->l.done[threadid]) { 
 #ifdef MULTIPLE
@@ -401,7 +417,13 @@ void push_work(int msg, shared_data<T> * sd, void * params, int threadid, shared
 	msg_struct<T> ms;
 	ms.msg = msg;
 	ms.params = params;
-	while(!sd->l.q->pushElement(&ms)) {pause();} restorepr(); 
+	while(!sd->l.q->pushElement(&ms)) {
+#ifdef MULTIPLE
+		poll(mysd, NULL);
+#endif
+		pause();
+	} 
+	restorepr(); 
 	spinlock::unlockN(sd->l.n);
 }
 
@@ -435,7 +457,12 @@ void push_work(int msg, shared_data<T> * sd, void * params, int threadid, shared
 	success = CAS(&sd->l.ms, NULL, &mss[threadid]);
 	while(!success)	
 	{
-		for (int i = 0; i < 400; i++) {pause();} restorepr(); 
+		for (int i = 0; i < 400; i++) {
+#ifdef MULTIPLE
+			poll(mysd, NULL); 
+#endif
+			pause();
+		} restorepr(); 
 		success = CAS(&sd->l.ms, NULL, &mss[threadid]);
 	}
 }

@@ -11,9 +11,8 @@
 #define NDF 10000
 #endif
 #ifdef LOOP
-pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t sig;
-int count = 0;
+volatile int count_lock;
+volatile int count;
 #endif
 
 volatile unsigned long long start;
@@ -59,13 +58,11 @@ void foo(threaddata<int> * td)
 	
 	//critical_section_owner(td->threadid, &switch_to_unbiased, td->sd);
 #ifdef LOOP
-	pthread_mutex_lock(&mymutex);
+	spinlock::lockN(&count_lock);
 	count++;
-	if(count == NUM_THREADS)
-		pthread_cond_signal(&sig);
-	pthread_mutex_unlock(&mymutex);
+	spinlock::unlockN(&count_lock);
 	
-	while(!td->done)
+	while(count!=NUM_THREADS)
 	{
 		pause();
 		poll(td->sds[td->threadid], NULL);
@@ -76,9 +73,6 @@ void foo(threaddata<int> * td)
 	
 int main()
 {
-#ifdef LOOP
-	pthread_cond_init (&sig, NULL);
-#endif
 	pthread_t threads[NUM_THREADS];
 
 	threaddata<int> j[NUM_THREADS];
@@ -107,12 +101,9 @@ int main()
 	for(int i = 0; i < NUM_THREADS; i++)
 		pthread_create(&threads[i], NULL, (void* (*)(void*)) foo, (void *) &j[i] );
 #ifdef LOOP		
-	pthread_mutex_lock(&mymutex);
-	pthread_cond_wait(&sig, &mymutex);
-	pthread_mutex_unlock(&mymutex);
 
 	for(int i = 0; i < NUM_THREADS; i++)
-		j[i].done = true;
+		pthread_join(threads[i], NULL);
 
 #else
 //	pthread_join(threads[0], NULL);	//wait for dom thread
